@@ -3,7 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2c3e50">
     <title>لوحة تحكم الإدارة</title>
     <style>
         * {
@@ -196,19 +200,115 @@
             font-size: 16px;
         }
 
+        @media (max-width: 1024px) {
+            .container {
+                padding: 15px;
+            }
+        }
+
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
             .header {
                 flex-direction: column;
                 gap: 15px;
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .btn-export {
+                width: 100%;
+                padding: 12px 20px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .stat-card h3 {
+                font-size: 14px;
+            }
+
+            .stat-card .number {
+                font-size: 28px;
             }
 
             .orders-table {
                 font-size: 12px;
+                display: block;
+                overflow-x: auto;
             }
 
-            .orders-table th,
+            .orders-table thead {
+                display: none;
+            }
+
+            .orders-table tr {
+                display: block;
+                margin-bottom: 15px;
+                border: 2px solid #e0e0e0;
+                border-radius: 8px;
+                padding: 10px;
+            }
+
             .orders-table td {
-                padding: 8px;
+                display: block;
+                text-align: right;
+                padding: 5px;
+                border: none;
+            }
+
+            .orders-table td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                margin-left: 10px;
+            }
+
+            .empty-state h3 {
+                font-size: 20px;
+            }
+
+            .empty-state p {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card h3 {
+                font-size: 13px;
+            }
+
+            .stat-card .number {
+                font-size: 24px;
+            }
+
+            .orders-table {
+                font-size: 11px;
+            }
+        }
+
+        /* Better touch targets */
+        @media (hover: none) {
+            .btn-export {
+                min-height: 44px;
             }
         }
     </style>

@@ -3,7 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1e3c72">
     <title>شاشة البوفيه - نظام الطلبات</title>
     <style>
         * {
@@ -554,24 +558,188 @@
             font-size: 13px;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .orders-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container > div:first-child {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .container > div:first-child > div:first-child > div:first-child {
+                font-size: 36px !important;
+                letter-spacing: 3px !important;
+            }
+
+            .container > div:first-child > div:first-child > div:last-child {
+                font-size: 12px !important;
+            }
+
+            .main-tabs {
+                flex-direction: column;
+            }
+
+            .main-tab-btn {
+                font-size: 16px;
+                padding: 12px;
+            }
+
+            .dashboard {
+                padding: 20px 15px;
             }
 
             .dashboard-header {
                 flex-direction: column;
                 align-items: stretch;
+                gap: 15px;
+            }
+
+            .dashboard-title {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .dashboard-title h1 {
+                font-size: 24px;
+                text-align: center;
             }
 
             .status-filter {
-                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .filter-btn {
+                flex: 1;
+                min-width: auto;
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+
+            .stats-bar {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-number {
+                font-size: 28px;
+            }
+
+            .orders-grid {
+                grid-template-columns: 1fr;
+                max-height: calc(100vh - 420px);
+            }
+
+            .order-card {
+                padding: 15px;
+            }
+
+            .order-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .order-info h3 {
+                font-size: 18px;
+            }
+
+            .action-btn {
+                padding: 10px 15px;
+                font-size: 14px;
             }
 
             .notification-popup {
-                right: 20px;
-                left: 20px;
+                right: 10px;
+                left: 10px;
                 min-width: auto;
+                padding: 15px;
+            }
+
+            .history-table {
+                font-size: 13px;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 10px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container > div:first-child > div:first-child > div:first-child {
+                font-size: 28px !important;
+                letter-spacing: 2px !important;
+            }
+
+            .dashboard-title h1 {
+                font-size: 20px;
+            }
+
+            .filter-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-number {
+                font-size: 24px;
+            }
+
+            .order-card {
+                padding: 12px;
+            }
+
+            .order-info h3 {
+                font-size: 16px;
+            }
+
+            .action-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .history-table {
+                font-size: 12px;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 8px 5px;
+            }
+        }
+
+        /* Better touch targets */
+        @media (hover: none) {
+            .filter-btn {
+                min-height: 44px;
+            }
+
+            .action-btn {
+                min-height: 44px;
+            }
+
+            .main-tab-btn {
+                min-height: 44px;
             }
         }
     </style>
@@ -705,6 +873,9 @@
         // Logout function
         function logout() {
             if (confirm('هل تريد تسجيل الخروج؟')) {
+                if (broadcastChannel) {
+                    broadcastChannel.close();
+                }
                 sessionStorage.removeItem('current_employee');
                 window.location.href = 'index.html';
             }
@@ -716,6 +887,31 @@
         let pollingInterval;
         let allOrders = [];
         let historyOrders = [];
+        let broadcastChannel = null;
+
+        // Setup BroadcastChannel for instant notifications
+        function setupBroadcastChannel() {
+            try {
+                broadcastChannel = new BroadcastChannel('buffet_orders_channel');
+                broadcastChannel.onmessage = (event) => {
+                    if (event.data.type === 'NEW_ORDER') {
+                        console.log('Received new order via BroadcastChannel:', event.data.order);
+                        showNotification(event.data.order);
+                        loadOrders();
+                    }
+                };
+            } catch (e) {
+                console.log('BroadcastChannel not supported, using polling only');
+            }
+        }
+
+        // Also listen to storage events as fallback
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'buffet_orders') {
+                console.log('Storage changed, reloading orders');
+                loadOrders();
+            }
+        });
 
         // Current Orders Functions
         async function getOrders() {
@@ -1080,6 +1276,53 @@
             }
         }
 
+        function showNotification(order) {
+            // Play notification sound
+            playNotificationSound();
+            
+            // Show browser notification if permitted
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const itemsList = order.items.map(item => `${item.item} ×${item.quantity}`).join(', ');
+                new Notification('🔔 طلب جديد!', {
+                    body: `${order.employeeName} - ${order.officeNumber}\n${itemsList}`,
+                    icon: '🍽️',
+                    tag: 'order-' + order.id,
+                    requireInteraction: false
+                });
+            }
+        }
+
+        function playNotificationSound() {
+            // Create notification sound using Web Audio API
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Create three beeps
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 800; // High pitch beep
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                }, i * 300); // 300ms between beeps
+            }
+        }
+
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
         function startPolling() {
             pollingInterval = setInterval(async () => {
                 const orders = await getOrders();
@@ -1103,6 +1346,12 @@
             if (!checkAuth()) {
                 return;
             }
+            
+            // Setup BroadcastChannel for instant notifications
+            setupBroadcastChannel();
+            
+            // Request notification permission
+            requestNotificationPermission();
             
             await loadOrders();
             const orders = await getOrders();

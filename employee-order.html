@@ -3,7 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
     <title>Request from the buffet - Employees</title>
     <style>
         * {
@@ -394,25 +398,100 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container > div:first-child {
+                flex-direction: column;
+                gap: 10px;
+            }
+
             .logo-container img {
                 max-width: 200px;
             }
 
             .order-form {
-                padding: 25px;
+                padding: 20px 15px;
+            }
+
+            .logo-container div:first-child {
+                font-size: 60px !important;
             }
 
             .form-header h1 {
-                font-size: 28px;
+                font-size: 24px;
+            }
+
+            .form-header p {
+                font-size: 14px;
+            }
+
+            .menu-section h3 {
+                font-size: 18px;
+                padding: 14px 20px;
             }
 
             .menu-items {
                 grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .menu-item {
+                padding: 15px;
+            }
+
+            .menu-item label {
+                font-size: 15px;
+            }
+
+            .drink-icon {
+                font-size: 28px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .qty-btn {
+                width: 35px;
+                height: 35px;
             }
 
             .success-message {
                 min-width: 90%;
-                padding: 40px 30px;
+                padding: 30px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .order-form {
+                padding: 15px 10px;
+            }
+
+            .form-header h1 {
+                font-size: 20px;
+            }
+
+            .menu-section h3 {
+                font-size: 16px;
+                padding: 12px 15px;
+            }
+
+            .drink-icon {
+                font-size: 24px;
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        /* Better touch targets for mobile */
+        @media (hover: none) {
+            .qty-btn {
+                min-width: 44px;
+                min-height: 44px;
+            }
+
+            .submit-btn {
+                min-height: 50px;
             }
         }
     </style>
@@ -634,6 +713,18 @@
                 console.log('Saving order:', order);
                 localStorage.setItem('buffet_orders', JSON.stringify(orders));
                 console.log('Order saved successfully');
+                
+                // Broadcast new order to buffet screen
+                try {
+                    const channel = new BroadcastChannel('buffet_orders_channel');
+                    channel.postMessage({
+                        type: 'NEW_ORDER',
+                        order: order
+                    });
+                    channel.close();
+                } catch (e) {
+                    console.log('BroadcastChannel not supported, using storage event fallback');
+                }
             } catch (error) {
                 console.error('Error saving order:', error);
                 alert('❌ Error saving order, please try again');
