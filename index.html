@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام البوفيه - تسجيل الدخول</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .login-form {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-container .logo-text {
+            font-size: 60px;
+            font-weight: bold;
+            color: #000000;
+            letter-spacing: 5px;
+            font-family: 'Geometric 231 Heavy BT', 'Geometric 231', Arial, sans-serif;
+            line-height: 1;
+        }
+
+        .logo-container .subtitle {
+            font-size: 24px;
+            color: #666;
+            margin-top: 5px;
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-header h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+            font-size: 16px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            border: 1px solid #fcc;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .links a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle button {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+            transition: color 0.3s;
+        }
+
+        .password-toggle button:hover {
+            color: #667eea;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        @media (max-width: 768px) {
+            .login-form {
+                padding: 30px;
+            }
+
+            .logo-container .logo-text {
+                font-size: 40px;
+            }
+
+            .logo-container .subtitle {
+                font-size: 18px;
+            }
+
+            .form-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="login-form">
+            <div class="logo-container">
+                <div class="logo-text">MARMONIL</div>
+                <div class="subtitle">Buffet</div>
+            </div>
+
+            <div class="form-header">
+                <h1>🔐 تسجيل الدخول</h1>
+                <p>مرحباً بك! سجل دخولك للمتابعة</p>
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                اسم المستخدم أو كلمة المرور غير صحيحة
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>اسم المستخدم *</label>
+                    <input type="text" id="username" required placeholder="أدخل اسم المستخدم" autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label>كلمة المرور *</label>
+                    <div class="password-toggle">
+                        <input type="password" id="password" required placeholder="أدخل كلمة المرور" autocomplete="current-password">
+                        <button type="button" id="togglePassword">👁️</button>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 30px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: normal;">
+                        <input type="checkbox" id="rememberMe" style="width: 20px; height: 20px; cursor: pointer; accent-color: #667eea;">
+                        <span>تذكرني (حفظ بيانات الدخول)</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="submit-btn">تسجيل الدخول</button>
+            </form>
+
+            <div class="links">
+                <a href="#" id="registerLink">ليس لديك حساب؟ سجل الآن</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Modal -->
+    <div id="registerModal" class="modal">
+        <div class="login-form" style="max-width: 600px;">
+            <div class="logo-container">
+                <div class="logo-text" style="font-size: 50px;">MARMONIL</div>
+                <div class="subtitle" style="font-size: 20px;">Buffet</div>
+            </div>
+
+            <div class="form-header">
+                <h1>👤 إنشاء حساب جديد</h1>
+                <p>سجل حسابك الآن للطلب من البوفيه</p>
+            </div>
+
+            <div class="error-message" id="registerError"></div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>اسم الموظف الكامل *</label>
+                    <input type="text" id="employeeName" required placeholder="مثال: أحمد محمد">
+                </div>
+
+                <div class="form-group">
+                    <label>القسم *</label>
+                    <input type="text" id="department" required placeholder="مثال: قسم تكنولوجيا المعلومات">
+                    <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                        💡 لموظفي البوفيه: اكتب "بوفيه" في خانة القسم
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label>اسم المستخدم *</label>
+                    <input type="text" id="regUsername" required placeholder="مثال: ahmed.mohamed">
+                </div>
+
+                <div class="form-group">
+                    <label>كلمة المرور *</label>
+                    <div class="password-toggle">
+                        <input type="password" id="regPassword" required placeholder="أدخل كلمة المرور" minlength="4">
+                        <button type="button" id="toggleRegPassword">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">✅ إنشاء الحساب</button>
+                <button type="button" class="submit-btn" onclick="closeRegisterModal()" style="margin-top: 10px; background: #6c757d;">إلغاء</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+        document.getElementById('toggleRegPassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('regPassword');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+        // Show/hide registration modal
+        document.getElementById('registerLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('registerModal').classList.add('show');
+        });
+
+        function closeRegisterModal() {
+            document.getElementById('registerModal').classList.remove('show');
+            document.getElementById('registerForm').reset();
+        }
+
+        // Load remembered credentials
+        window.addEventListener('load', function() {
+            const remembered = localStorage.getItem('remembered_credentials');
+            if (remembered) {
+                const credentials = JSON.parse(remembered);
+                document.getElementById('username').value = credentials.username;
+                document.getElementById('password').value = credentials.password;
+                document.getElementById('rememberMe').checked = true;
+            }
+
+            // Check if already logged in
+            const currentEmployee = sessionStorage.getItem('current_employee');
+            if (currentEmployee) {
+                const user = JSON.parse(currentEmployee);
+                redirectUser(user);
+            }
+        });
+
+        // Redirect based on user type
+        function redirectUser(user) {
+            if (user.isAdmin) {
+                window.location.href = 'admin-panel.html';
+            } else if (user.department && user.department.toLowerCase() === 'بوفيه') {
+                window.location.href = 'buffet-system.html';
+            } else {
+                window.location.href = 'employee-order.html';
+            }
+        }
+
+        // Handle login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            // Check for Admin user
+            if (username === 'Admin.buffet' && password === 'AdminMarmo') {
+                const adminUser = {
+                    id: 'admin',
+                    username: 'Admin.buffet',
+                    name: 'المدير',
+                    department: 'الإدارة',
+                    isAdmin: true
+                };
+
+                sessionStorage.setItem('current_employee', JSON.stringify(adminUser));
+
+                if (rememberMe) {
+                    localStorage.setItem('remembered_credentials', JSON.stringify({ username, password }));
+                } else {
+                    localStorage.removeItem('remembered_credentials');
+                }
+
+                window.location.href = 'admin-panel.html';
+                return;
+            }
+
+            // Get employees from localStorage
+            const employees = JSON.parse(localStorage.getItem('buffet_employees') || '[]');
+
+            // Find employee
+            const employee = employees.find(emp => 
+                emp.username === username && emp.password === password
+            );
+
+            if (employee) {
+                const userData = {
+                    id: employee.id,
+                    username: employee.username,
+                    name: employee.name,
+                    department: employee.department,
+                    isAdmin: false,
+                    isBuffet: employee.department && employee.department.toLowerCase() === 'بوفيه'
+                };
+
+                sessionStorage.setItem('current_employee', JSON.stringify(userData));
+
+                if (rememberMe) {
+                    localStorage.setItem('remembered_credentials', JSON.stringify({ username, password }));
+                } else {
+                    localStorage.removeItem('remembered_credentials');
+                }
+
+                redirectUser(userData);
+            } else {
+                const errorMsg = document.getElementById('errorMessage');
+                errorMsg.classList.add('show');
+                
+                setTimeout(() => {
+                    errorMsg.classList.remove('show');
+                }, 3000);
+
+                document.getElementById('password').value = '';
+            }
+        });
+
+        // Handle registration
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('employeeName').value.trim();
+            const department = document.getElementById('department').value.trim();
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+
+            const employees = JSON.parse(localStorage.getItem('buffet_employees') || '[]');
+
+            if (employees.some(emp => emp.username === username)) {
+                const errorMsg = document.getElementById('registerError');
+                errorMsg.textContent = '⚠️ اسم المستخدم موجود بالفعل، اختر اسماً آخر';
+                errorMsg.classList.add('show');
+                
+                setTimeout(() => {
+                    errorMsg.classList.remove('show');
+                }, 3000);
+                return;
+            }
+
+            const newEmployee = {
+                id: Date.now().toString(),
+                name: name,
+                department: department,
+                username: username,
+                password: password,
+                createdAt: new Date().toISOString()
+            };
+
+            employees.push(newEmployee);
+            localStorage.setItem('buffet_employees', JSON.stringify(employees));
+
+            alert('✅ تم إنشاء الحساب بنجاح! جاري تسجيل الدخول...');
+            
+            closeRegisterModal();
+
+            // Auto login
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+        });
+    </script>
+</body>
+
+</html>
