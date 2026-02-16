@@ -743,6 +743,18 @@
             }
         }
     </style>
+ const firebaseConfig = {
+  apiKey: "AIzaSyAhehi0m7CD8TU2PusKbXan7vfzuGYoSlE",
+  authDomain: "buffet-82ec0.firebaseapp.com",
+  databaseURL: "https://buffet-82ec0-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "buffet-82ec0",
+  storageBucket: "buffet-82ec0.firebasestorage.app",
+  messagingSenderId: "737817727386",
+  appId: "1:737817727386:web:e3b13235cb6017ac47aa23",
+  measurementId: "G-XL9C0ZQGRF"
+};
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 
 <body>
@@ -846,6 +858,33 @@
     </audio>
 
     <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBxLB5vqVGHJ9X_Demo_Key_Replace_This",
+            authDomain: "buffet-system.firebaseapp.com",
+            databaseURL: "https://buffet-system-default-rtdb.firebaseio.com",
+            projectId: "buffet-system",
+            storageBucket: "buffet-system.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abc123def456"
+        };
+
+        // Initialize Firebase
+        let db = null;
+        let useFirebase = false;
+
+        try {
+            if (typeof firebase !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                useFirebase = true;
+                console.log('✅ Firebase initialized successfully');
+            }
+        } catch (error) {
+            console.warn('⚠️ Firebase not available, using localStorage only:', error);
+            useFirebase = false;
+        }
+
         // Authentication check
         function checkAuth() {
             const employeeData = sessionStorage.getItem('current_employee');
@@ -905,6 +944,44 @@
             }
         }
 
+        // Setup Firebase listener for real-time updates
+        function setupFirebaseListener() {
+            if (useFirebase && db) {
+                console.log('🔥 Setting up Firebase listener...');
+                
+                // Listen for new orders
+                db.ref('orders').on('child_added', (snapshot) => {
+                    const order = snapshot.val();
+                    console.log('🔥 New order detected in Firebase:', order);
+                    
+                    // Check if this is truly a new order (not from initial load)
+                    const now = Date.now();
+                    const orderTime = new Date(order.timestamp).getTime();
+                    
+                    // If order is less than 10 seconds old, it's new
+                    if (now - orderTime < 10000) {
+                        showNotification(order);
+                    }
+                    
+                    loadOrders();
+                });
+                
+                // Listen for order updates
+                db.ref('orders').on('child_changed', (snapshot) => {
+                    console.log('🔥 Order updated in Firebase');
+                    loadOrders();
+                });
+                
+                // Listen for order removal
+                db.ref('orders').on('child_removed', (snapshot) => {
+                    console.log('🔥 Order removed in Firebase');
+                    loadOrders();
+                });
+                
+                console.log('✅ Firebase listener setup complete');
+            }
+        }
+
         // Also listen to storage events as fallback
         window.addEventListener('storage', (event) => {
             if (event.key === 'buffet_orders') {
@@ -916,6 +993,24 @@
         // Current Orders Functions
         async function getOrders() {
             try {
+                // Try Firebase first
+                if (useFirebase && db) {
+                    try {
+                        const snapshot = await db.ref('orders').once('value');
+                        const data = snapshot.val();
+                        if (data) {
+                            const orders = Object.values(data);
+                            // Also sync to localStorage
+                            localStorage.setItem('buffet_orders', JSON.stringify(orders));
+                            return orders;
+                        }
+                    } catch (firebaseError) {
+                        console.error('❌ Firebase error, falling back to localStorage:', firebaseError);
+                        useFirebase = false;
+                    }
+                }
+                
+                // Fallback to localStorage
                 const data = localStorage.getItem('buffet_orders');
                 return data ? JSON.parse(data) : [];
             } catch (error) {
@@ -926,6 +1021,33 @@
 
         async function updateOrderStatus(orderId, newStatus) {
             try {
+                // Update in Firebase
+                if (useFirebase && db) {
+                    try {
+                        const orderRef = db.ref('orders/' + orderId);
+                        const snapshot = await orderRef.once('value');
+                        const order = snapshot.val();
+                        
+                        if (order) {
+                            order.status = newStatus;
+                            
+                            if (newStatus === 'delivered') {
+                                // Move to history
+                                await db.ref('history/' + orderId).set(order);
+                                await orderRef.remove();
+                                console.log('✅ Order moved to history in Firebase');
+                            } else {
+                                await orderRef.update({ status: newStatus });
+                                console.log('✅ Order status updated in Firebase');
+                            }
+                        }
+                    } catch (firebaseError) {
+                        console.error('❌ Firebase error:', firebaseError);
+                        useFirebase = false;
+                    }
+                }
+                
+                // Also update localStorage
                 const orders = await getOrders();
                 const order = orders.find(o => o.id === orderId);
                 if (order) {
@@ -1347,8 +1469,11 @@
                 return;
             }
             
-            // Setup BroadcastChannel for instant notifications
+            // Setup BroadcastChannel for instant notifications (same device)
             setupBroadcastChannel();
+            
+            // Setup Firebase listener for real-time updates (cross-device)
+            setupFirebaseListener();
             
             // Request notification permission
             requestNotificationPermission();
@@ -1356,7 +1481,14 @@
             await loadOrders();
             const orders = await getOrders();
             lastOrderCount = orders.filter(o => o.status === 'new').length;
-            startPolling();
+            
+            // Only start polling if Firebase is not available
+            if (!useFirebase) {
+                console.log('⚠️ Firebase not available, using polling');
+                startPolling();
+            } else {
+                console.log('✅ Using Firebase real-time updates, polling disabled');
+            }
         })();
     </script>
 </body>
