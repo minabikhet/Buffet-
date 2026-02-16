@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request from the buffet - Employees</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat ', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .order-form {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 15px;
+        }
+
+        .logo-container img {
+            max-width: 300px;
+            height: auto;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.05);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-header h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+            font-size: 16px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .menu-section {
+            margin-bottom: 30px;
+        }
+
+        .menu-section h3 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 22px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 10px;
+        }
+
+        .menu-item {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .menu-item:hover::before {
+            left: 100%;
+        }
+
+        .menu-item:hover {
+            border-color: #667eea;
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.25);
+        }
+
+        .menu-item.selected {
+            background: linear-gradient(145deg, #e8eaf6 0%, #c5cae9 100%);
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .menu-item.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            animation: checkPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes checkPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .menu-item label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 17px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .drink-icon {
+            font-size: 36px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 8px;
+            transition: transform 0.3s;
+        }
+
+        .menu-item:hover .drink-icon {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .menu-item input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .quantity-control {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #ddd;
+        }
+
+        .menu-item.selected .quantity-control {
+            display: flex;
+        }
+
+        .qty-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .qty-btn:hover {
+            background: #5568d3;
+            transform: scale(1.1);
+        }
+
+        .qty-btn:active {
+            transform: scale(0.95);
+        }
+
+        .qty-input {
+            width: 60px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 30px;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            z-index: 1000;
+            min-width: 400px;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -70%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: checkmark 0.6s ease;
+        }
+
+        @keyframes checkmark {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-message h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 28px;
+        }
+
+        .success-message p {
+            color: #666;
+            font-size: 18px;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            backdrop-filter: blur(5px);
+        }
+
+        .overlay.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo-container img {
+                max-width: 200px;
+            }
+
+            .order-form {
+                padding: 25px;
+            }
+
+            .form-header h1 {
+                font-size: 28px;
+            }
+
+            .menu-items {
+                grid-template-columns: 1fr;
+            }
+
+            .success-message {
+                min-width: 90%;
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span id="welcomeMessage" style="color: white; font-weight: bold; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 5px;"></span>
+            </div>
+            <button onclick="logout()" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">🚪 تسجيل خروج</button>
+        </div>
+        <div class="order-form">
+            <div class="logo-container">
+                <div
+                    style="font-size: 100px; font-weight: bold; color: #000000; padding-bottom: 0px; letter-spacing: 8px; font-family: 'Geometric 231 Heavy BT', 'Geometric 231', Arial, sans-serif; line-height: 1;">
+                    MARMONIL</div>
+                <div style="font-size: 32px; color: #666; margin-top: 5px; font-weight: 500; letter-spacing: 3px;">Buffet</div>
+            </div>
+            <div class="form-header">
+                <h1>🍽️ Request from the buffet</h1>
+                <p>Choose what you want and we'll prepare it for you</p>
+            </div>
+
+            <form id="orderForm">
+                <div class="form-group" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                    <p style="text-align: center; color: #333; font-size: 18px;">
+                        <strong>الموظف:</strong> <span id="displayEmployeeName"></span><br>
+                        <strong>القسم:</strong> <span id="displayDepartment"></span>
+                    </p>
+                </div>
+
+                <div class="menu-section">
+                    <h3>☕ Hot Drinks</h3>
+                    <div class="menu-items" id="hotDrinks"></div>
+                </div>
+
+                <button type="submit" class="submit-btn">📤 Submit Order</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="success-message" id="successMessage">
+        <div class="success-icon">✅</div>
+        <h2>Order sent successfully!</h2>
+        <p>The buffet has received your order and will prepare it as soon as possible</p>
+    </div>
+
+    <script>
+        // Check authentication and authorization
+        let currentEmployee = null;
+
+        function checkAuth() {
+            const employeeData = sessionStorage.getItem('current_employee');
+            if (!employeeData) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            currentEmployee = JSON.parse(employeeData);
+            
+            // Redirect admins to admin panel
+            if (currentEmployee.isAdmin) {
+                window.location.href = 'admin-panel.html';
+                return false;
+            }
+            
+            // Redirect buffet workers to buffet system
+            if (currentEmployee.isBuffet || (currentEmployee.department && currentEmployee.department.toLowerCase() === 'بوفيه')) {
+                window.location.href = 'buffet-system.html';
+                return false;
+            }
+            
+            return true;
+        }
+
+        function logout() {
+            if (confirm('هل تريد تسجيل الخروج؟')) {
+                sessionStorage.removeItem('current_employee');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Initialize employee info
+        function initEmployeeInfo() {
+            if (currentEmployee) {
+                document.getElementById('welcomeMessage').textContent = `مرحباً ${currentEmployee.name}`;
+                document.getElementById('displayEmployeeName').textContent = currentEmployee.name;
+                document.getElementById('displayDepartment').textContent = currentEmployee.department;
+            }
+        }
+
+        // Menu Data
+        const menuData = {
+            hotDrinks: [
+                { name: 'شاي', icon: '🍵' },
+                { name: 'شاي بالحليب', icon: '🥛' },
+                { name: 'شاي أخضر', icon: '🍵' },
+                { name: 'شاي بالنعناع', icon: '🍵' },
+                { name: 'نعناع', icon: '🍃' },
+                { name: 'ينسون', icon: '⭐' },
+                { name: 'قهوة سادة', icon: '☕' },
+                { name: 'قهوة مانو', icon: '☕' },
+                { name: 'قهوة مظبوط', icon: '☕' },
+                { name: 'قهوة زيادة', icon: '☕' },
+                { name: 'قهوة سادة بالحليب', icon: '🥛' },
+                { name: 'قهوة مانو بالحليب', icon: '🥛' },
+                { name: 'قهوة مظبوط بالحليب', icon: '🥛' },
+                { name: 'قهوة بالحليب زيادة', icon: '🥛' },
+                { name: ' نسكافيه بلاك', icon: '☕' },
+                { name: 'نسكافيه بالحليب', icon: '🥛' },
+                { name: 'فلات وايت', icon: '☕' },
+                { name: 'لاتيه', icon: '☕' },
+                { name: 'موكا', icon: '☕' },
+                { name: 'كابتشينو', icon: '☕' }
+            ]
+        };
+
+        // Initialize menu
+        function initMenu() {
+            Object.keys(menuData).forEach(category => {
+                const container = document.getElementById(category);
+                menuData[category].forEach((item, index) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'menu-item';
+                    itemDiv.innerHTML = `
+                        <label>
+                            <input type="checkbox" class="item-checkbox" data-category="${category}" data-item="${item.name}">
+                            <div class="drink-icon">${item.icon}</div>
+                            <span>${item.name}</span>
+                        </label>
+                        <div class="quantity-control">
+                            <button type="button" class="qty-btn" onclick="changeQty(this, -1)">−</button>
+                            <input type="number" class="qty-input" value="1" min="1" max="10" readonly>
+                            <button type="button" class="qty-btn" onclick="changeQty(this, 1)">+</button>
+                        </div>
+                    `;
+
+                    const checkbox = itemDiv.querySelector('.item-checkbox');
+                    checkbox.addEventListener('change', function () {
+                        if (this.checked) {
+                            itemDiv.classList.add('selected');
+                        } else {
+                            itemDiv.classList.remove('selected');
+                        }
+                    });
+
+                    container.appendChild(itemDiv);
+                });
+            });
+        }
+
+        function changeQty(btn, delta) {
+            const input = btn.parentElement.querySelector('.qty-input');
+            let val = parseInt(input.value) + delta;
+            if (val >= 1 && val <= 10) {
+                input.value = val;
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('orderForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            if (!currentEmployee) {
+                alert('⚠️ خطأ في جلسة التسجيل، الرجاء تسجيل الدخول مرة أخرى');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const selectedItems = [];
+            document.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
+                const item = checkbox.dataset.item;
+                const qty = checkbox.closest('.menu-item').querySelector('.qty-input').value;
+                selectedItems.push({ item, quantity: parseInt(qty) });
+            });
+
+            if (selectedItems.length === 0) {
+                alert('⚠️ Choose at least one item from the list');
+                return;
+            }
+
+            const order = {
+                id: Date.now(),
+                employeeName: currentEmployee.name,
+                officeNumber: currentEmployee.department,
+                employeeUsername: currentEmployee.username,
+                items: selectedItems,
+                status: 'new',
+                timestamp: new Date().toISOString()
+            };
+
+            // Save order
+            await saveOrder(order);
+
+            // Show success message
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('successMessage').classList.add('show');
+
+            // Reset form
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            document.querySelectorAll('.item-checkbox').forEach(cb => {
+                cb.checked = false;
+            });
+
+            setTimeout(() => {
+                document.getElementById('overlay').classList.remove('show');
+                document.getElementById('successMessage').classList.remove('show');
+            }, 3500);
+        });
+
+        async function saveOrder(order) {
+            try {
+                const orders = await getOrders();
+                orders.push(order);
+                console.log('Saving order:', order);
+                localStorage.setItem('buffet_orders', JSON.stringify(orders));
+                console.log('Order saved successfully');
+            } catch (error) {
+                console.error('Error saving order:', error);
+                alert('❌ Error saving order, please try again');
+                throw error;
+            }
+        }
+
+        async function getOrders() {
+            try {
+                const data = localStorage.getItem('buffet_orders');
+                console.log('Get orders data:', data);
+                return data ? JSON.parse(data) : [];
+            } catch (error) {
+                console.error('Error getting orders:', error);
+                return [];
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            if (checkAuth()) {
+                initEmployeeInfo();
+                initMenu();
+            }
+        });
+
+        // Make logout function available globally
+        window.logout = logout;
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الإدارة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-weight: bold;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .orders-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .orders-header h2 {
+            color: #333;
+            font-size: 22px;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .orders-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .orders-table th {
+            padding: 15px;
+            text-align: right;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .orders-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .orders-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .order-items {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .order-item {
+            margin-bottom: 3px;
+        }
+
+        .no-orders {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .orders-table {
+                font-size: 12px;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <div>
+            <div style="font-size: 36px; font-weight: bold; color: #000; letter-spacing: 3px; font-family: 'Geometric 231 Heavy BT', Arial, sans-serif; line-height: 1;">MARMONIL</div>
+            <div style="font-size: 16px; color: #666; font-weight: 500; letter-spacing: 2px; margin-top: 3px;">Buffet</div>
+            <h1 style="margin-top: 10px;">📊 لوحة تحكم الإدارة</h1>
+            <p style="color: #666; margin-top: 5px;">مرحباً بك في نظام إدارة البوفيه</p>
+        </div>
+        <div class="header-buttons">
+            <button class="btn btn-primary" onclick="exportToExcel()">📥 تصدير إلى Excel</button>
+            <button class="btn btn-danger" onclick="logout()">🚪 تسجيل خروج</button>
+        </div>
+    </div>
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <h3>إجمالي الطلبات</h3>
+            <div class="number" id="totalOrders">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>الموظفين النشطين</h3>
+            <div class="number" id="activeEmployees">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>طلبات اليوم</h3>
+            <div class="number" id="todayOrders">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>إجمالي الأصناف</h3>
+            <div class="number" id="totalItems">0</div>
+        </div>
+    </div>
+
+    <div class="filters">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>اسم الموظف</label>
+                <input type="text" id="filterEmployee" placeholder="ابحث عن موظف...">
+            </div>
+            <div class="filter-group">
+                <label>القسم</label>
+                <input type="text" id="filterDepartment" placeholder="ابحث عن قسم...">
+            </div>
+            <div class="filter-group">
+                <label>من تاريخ</label>
+                <input type="date" id="filterFromDate">
+            </div>
+            <div class="filter-group">
+                <label>إلى تاريخ</label>
+                <input type="date" id="filterToDate">
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="applyFilters()" style="width: 100%;">🔍 تطبيق الفلاتر</button>
+    </div>
+
+    <div class="orders-container">
+        <div class="orders-header">
+            <h2>📋 سجل الطلبات</h2>
+            <span id="ordersCount" style="color: #666;">عدد الطلبات: 0</span>
+        </div>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>رقم الطلب</th>
+                    <th>اسم الموظف</th>
+                    <th>القسم</th>
+                    <th>الأصناف المطلوبة</th>
+                    <th>التاريخ</th>
+                    <th>الوقت</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+                <tr>
+                    <td colspan="6" class="no-orders">لا توجد طلبات حتى الآن</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let allOrders = [];
+        let filteredOrders = [];
+
+        // Check admin authentication
+        function checkAuth() {
+            const employeeData = sessionStorage.getItem('current_employee');
+            if (!employeeData) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            const employee = JSON.parse(employeeData);
+            if (!employee.isAdmin) {
+                alert('⚠️ غير مصرح لك بالدخول لهذه الصفحة');
+                window.location.href = 'index.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('هل تريد تسجيل الخروج؟')) {
+                sessionStorage.removeItem('current_employee');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Load orders
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('buffet_orders') || '[]');
+            allOrders = orders.sort((a, b) => b.id - a.id); // Sort by newest first
+            filteredOrders = [...allOrders];
+            displayOrders(filteredOrders);
+            updateStats(filteredOrders);
+        }
+
+        // Display orders in table
+        function displayOrders(orders) {
+            const tbody = document.getElementById('ordersTableBody');
+            document.getElementById('ordersCount').textContent = `عدد الطلبات: ${orders.length}`;
+
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-orders">لا توجد طلبات تطابق الفلاتر</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => {
+                const date = new Date(order.timestamp);
+                const dateStr = date.toLocaleDateString('ar-EG');
+                const timeStr = date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+                const itemsList = order.items.map(item => 
+                    `<div class="order-item">• ${item.item} (${item.quantity})</div>`
+                ).join('');
+
+                return `
+                    <tr>
+                        <td><strong>#${order.id}</strong></td>
+                        <td>${order.employeeName}</td>
+                        <td>${order.officeNumber}</td>
+                        <td><div class="order-items">${itemsList}</div></td>
+                        <td>${dateStr}</td>
+                        <td>${timeStr}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Update statistics
+        function updateStats(orders) {
+            // Total orders
+            document.getElementById('totalOrders').textContent = orders.length;
+
+            // Active employees (unique)
+            const uniqueEmployees = new Set(orders.map(o => o.employeeName));
+            document.getElementById('activeEmployees').textContent = uniqueEmployees.size;
+
+            // Today's orders
+            const today = new Date().toDateString();
+            const todayOrders = orders.filter(o => new Date(o.timestamp).toDateString() === today);
+            document.getElementById('todayOrders').textContent = todayOrders.length;
+
+            // Total items
+            const totalItems = orders.reduce((sum, order) => {
+                return sum + order.items.reduce((itemSum, item) => itemSum + item.quantity, 0);
+            }, 0);
+            document.getElementById('totalItems').textContent = totalItems;
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const employeeFilter = document.getElementById('filterEmployee').value.toLowerCase();
+            const departmentFilter = document.getElementById('filterDepartment').value.toLowerCase();
+            const fromDate = document.getElementById('filterFromDate').value;
+            const toDate = document.getElementById('filterToDate').value;
+
+            filteredOrders = allOrders.filter(order => {
+                // Employee name filter
+                if (employeeFilter && !order.employeeName.toLowerCase().includes(employeeFilter)) {
+                    return false;
+                }
+
+                // Department filter
+                if (departmentFilter && !order.officeNumber.toLowerCase().includes(departmentFilter)) {
+                    return false;
+                }
+
+                // Date filters
+                const orderDate = new Date(order.timestamp).toISOString().split('T')[0];
+                if (fromDate && orderDate < fromDate) {
+                    return false;
+                }
+                if (toDate && orderDate > toDate) {
+                    return false;
+                }
+
+                return true;
+            });
+
+            displayOrders(filteredOrders);
+            updateStats(filteredOrders);
+        }
+
+        // Export to Excel
+        function exportToExcel() {
+            if (filteredOrders.length === 0) {
+                alert('⚠️ لا توجد بيانات للتصدير');
+                return;
+            }
+
+            // Prepare data for export
+            const exportData = filteredOrders.map(order => {
+                const date = new Date(order.timestamp);
+                const items = order.items.map(item => `${item.item} (${item.quantity})`).join(', ');
+
+                return {
+                    'رقم الطلب': order.id,
+                    'اسم الموظف': order.employeeName,
+                    'القسم': order.officeNumber,
+                    'الأصناف المطلوبة': items,
+                    'التاريخ': date.toLocaleDateString('ar-EG'),
+                    'الوقت': date.toLocaleTimeString('ar-EG'),
+                    'عدد الأصناف': order.items.reduce((sum, item) => sum + item.quantity, 0)
+                };
+            });
+
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(exportData);
+
+            // Set column widths
+            ws['!cols'] = [
+                { wch: 12 },  // Order ID
+                { wch: 20 },  // Employee name
+                { wch: 20 },  // Department
+                { wch: 50 },  // Items
+                { wch: 15 },  // Date
+                { wch: 12 },  // Time
+                { wch: 12 }   // Total items
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws, 'طلبات البوفيه');
+
+            // Generate filename with current date
+            const filename = `buffet_orders_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+            // Save file
+            XLSX.writeFile(wb, filename);
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            if (checkAuth()) {
+                loadOrders();
+            }
+        });
+
+        // Auto refresh every 30 seconds
+        setInterval(() => {
+            loadOrders();
+        }, 30000);
+    </script>
+</body>
+
+</html>

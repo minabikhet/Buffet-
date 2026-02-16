@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شاشة البوفيه - نظام الطلبات</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .main-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .main-tab-btn.active {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .dashboard {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #f0f0f0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .dashboard-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .dashboard-title h1 {
+            color: #1e3c72;
+            font-size: 32px;
+        }
+
+        .new-orders-badge {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+            }
+        }
+
+        .status-filter {
+            display: flex;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border: 2px solid transparent;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .filter-btn:hover {
+            background: #e8eaf6;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border-color: #1e3c72;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border-right: 4px solid #ddd;
+        }
+
+        .stat-card.new {
+            border-right-color: #ff9800;
+        }
+
+        .stat-card.preparing {
+            border-right-color: #2196F3;
+        }
+
+        .stat-card.ready {
+            border-right-color: #4CAF50;
+        }
+
+        .stat-card.total {
+            border-right-color: #9C27B0;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            max-height: calc(100vh - 320px);
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .orders-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .orders-grid::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .orders-grid::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 10px;
+        }
+
+        .orders-grid::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+        }
+
+        .order-card {
+            background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-right: 5px solid #ddd;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .order-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, currentColor, transparent);
+            opacity: 0;
+        }
+
+        .order-card.new {
+            border-right-color: #ff9800;
+            animation: newOrder 1s ease;
+        }
+
+        .order-card.new::before {
+            background: #ff9800;
+            animation: shine 2s infinite;
+        }
+
+        @keyframes newOrder {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes shine {
+            0% {
+                opacity: 0;
+                left: -100%;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                left: 100%;
+            }
+        }
+
+        .order-card.preparing {
+            border-right-color: #2196F3;
+        }
+
+        .order-card.ready {
+            border-right-color: #4CAF50;
+        }
+
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .order-info h3 {
+            color: #1e3c72;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .order-info p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .order-meta {
+            text-align: left;
+        }
+
+        .order-time {
+            background: #e8eaf6;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #1e3c72;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-new {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-preparing {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-ready {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-delivered {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .order-items {
+            margin-bottom: 12px;
+        }
+
+        .order-item {
+            background: white;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .item-name {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .item-qty {
+            background: #1e3c72;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-preparing {
+            background: linear-gradient(135deg, #2196F3 0%, #1976d2 100%);
+            color: white;
+        }
+
+        .btn-ready {
+            background: linear-gradient(135deg, #4CAF50 0%, #388e3c 100%);
+            color: white;
+        }
+
+        .btn-delivered {
+            background: linear-gradient(135deg, #9C27B0 0%, #7b1fa2 100%);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+        }
+
+        .notification-popup {
+            position: fixed;
+            top: -200px;
+            right: 30px;
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            min-width: 350px;
+            border-right: 5px solid #ff9800;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .notification-popup.show {
+            top: 30px;
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .notification-icon {
+            font-size: 40px;
+            animation: bounce 1s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .notification-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff9800;
+        }
+
+        .notification-body {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* History Table Styles */
+        .history-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .date-filter select {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .history-table thead {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .history-table th {
+            padding: 15px;
+            text-align: right;
+            font-size: 16px;
+        }
+
+        .history-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .history-table tbody tr {
+            transition: all 0.3s;
+        }
+
+        .history-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .item-tag {
+            display: inline-block;
+            background: #e8eaf6;
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin: 2px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .orders-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .status-filter {
+                flex-wrap: wrap;
+            }
+
+            .notification-popup {
+                right: 20px;
+                left: 20px;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Logo and Logout -->
+        <div style="background: white; padding: 20px 30px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: center; flex: 1;">
+                <div style="font-size: 48px; font-weight: bold; color: #000000; letter-spacing: 5px; font-family: 'Geometric 231 Heavy BT', 'Geometric 231', Arial, sans-serif; line-height: 1;">MARMONIL</div>
+                <div style="font-size: 14px; font-weight: 500; color: #667eea; letter-spacing: 6px; margin-top: 5px; font-family: 'Montserrat', sans-serif;">BUFFET</div>
+            </div>
+            <button onclick="logout()" style="padding: 12px 24px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s;">🚪 تسجيل خروج</button>
+        </div>
+
+        <div class="main-tabs">
+            <button class="main-tab-btn active" onclick="switchMainTab('current')">📋 الطلبات الحالية</button>
+            <button class="main-tab-btn" onclick="switchMainTab('history')">📊 السجل والتقارير</button>
+        </div>
+
+        <!-- Current Orders Tab -->
+        <div id="current-tab" class="tab-content active">
+            <div class="dashboard">
+                <div class="dashboard-header">
+                    <div class="dashboard-title">
+                        <h1>📋 الطلبات الحالية</h1>
+                        <div class="new-orders-badge" id="newBadge" style="display: none;">
+                            <span id="newCount">0</span> طلب جديد
+                        </div>
+                    </div>
+                    <div class="status-filter">
+                        <button class="filter-btn active" onclick="filterOrders('all')">الكل</button>
+                        <button class="filter-btn" onclick="filterOrders('new')">جديد</button>
+                        <button class="filter-btn" onclick="filterOrders('preparing')">يتجهز</button>
+                        <button class="filter-btn" onclick="filterOrders('ready')">جاهز</button>
+                    </div>
+                </div>
+
+                <div class="stats-bar" id="currentStats"></div>
+                <div class="orders-grid" id="ordersGrid">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🍽️</div>
+                        <h3>مفيش طلبات حالياً</h3>
+                        <p>الطلبات الجديدة هتظهر هنا تلقائياً مع صوت تنبيه</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="history-tab" class="tab-content">
+            <div class="dashboard">
+                <div class="dashboard-header">
+                    <div class="dashboard-title">
+                        <h1>📊 السجل والتقارير</h1>
+                    </div>
+                    <div class="history-controls">
+                        <div class="date-filter">
+                            <label>عرض:</label>
+                            <select id="dateFilter" onchange="loadHistory()">
+                                <option value="today">اليوم</option>
+                                <option value="week">آخر 7 أيام</option>
+                                <option value="month">آخر 30 يوم</option>
+                                <option value="all" selected>كل الطلبات</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-bar" id="historyStats"></div>
+
+                <div class="status-filter" style="margin-bottom: 20px;">
+                    <button class="filter-btn active" onclick="filterHistory('all')">الكل</button>
+                    <button class="filter-btn" onclick="filterHistory('new')">جديد</button>
+                    <button class="filter-btn" onclick="filterHistory('preparing')">يتجهز</button>
+                    <button class="filter-btn" onclick="filterHistory('ready')">جاهز</button>
+                    <button class="filter-btn" onclick="filterHistory('delivered')">تم التوصيل</button>
+                </div>
+
+                <div id="historyContent">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>جاري تحميل السجل...</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification-popup" id="notification">
+        <div class="notification-header">
+            <div class="notification-icon">🔔</div>
+            <div class="notification-title">طلب جديد!</div>
+        </div>
+        <div class="notification-body" id="notificationBody"></div>
+    </div>
+
+    <!-- Notification Sound -->
+    <audio id="notificationSound" preload="auto">
+        <source
+            src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhAC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAA4S/TfPuAAAAAAAAAAAAAAAAAAAA//sQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGQAD/AAAGkAAAAIAAANIAAAAQAAAaQAAAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ=="
+            type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Authentication check
+        function checkAuth() {
+            const employeeData = sessionStorage.getItem('current_employee');
+            if (!employeeData) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            const employee = JSON.parse(employeeData);
+            
+            // Redirect admins to admin panel
+            if (employee.isAdmin) {
+                window.location.href = 'admin-panel.html';
+                return false;
+            }
+            
+            // Check if user is buffet worker
+            if (!employee.isBuffet && !(employee.department && employee.department.toLowerCase() === 'بوفيه')) {
+                alert('⚠️ غير مصرح لك بالدخول لهذه الصفحة');
+                window.location.href = 'index.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('هل تريد تسجيل الخروج؟')) {
+                sessionStorage.removeItem('current_employee');
+                window.location.href = 'index.html';
+            }
+        }
+
+        let currentFilter = 'all';
+        let currentHistoryFilter = 'all';
+        let lastOrderCount = 0;
+        let pollingInterval;
+        let allOrders = [];
+        let historyOrders = [];
+
+        // Current Orders Functions
+        async function getOrders() {
+            try {
+                const data = localStorage.getItem('buffet_orders');
+                return data ? JSON.parse(data) : [];
+            } catch (error) {
+                console.error('Error getting orders:', error);
+                return [];
+            }
+        }
+
+        async function updateOrderStatus(orderId, newStatus) {
+            try {
+                const orders = await getOrders();
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    order.status = newStatus;
+                    if (newStatus === 'delivered') {
+                        // Move to history
+                        const historyData = localStorage.getItem('buffet_history');
+                        const history = historyData ? JSON.parse(historyData) : [];
+                        history.push(order);
+                        localStorage.setItem('buffet_history', JSON.stringify(history));
+
+                        // Remove from current
+                        const filteredOrders = orders.filter(o => o.id !== orderId);
+                        localStorage.setItem('buffet_orders', JSON.stringify(filteredOrders));
+                    } else {
+                        localStorage.setItem('buffet_orders', JSON.stringify(orders));
+                    }
+                    await loadOrders();
+                    if (document.getElementById('history-tab').classList.contains('active')) {
+                        await loadHistory();
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating order:', error);
+            }
+        }
+
+        function showNotification(order) {
+            const notification = document.getElementById('notification');
+            const notificationBody = document.getElementById('notificationBody');
+
+            const itemsList = order.items.map(item => `${item.item} (×${item.quantity})`).join('، ');
+            notificationBody.innerHTML = `
+                <strong>${order.employeeName}</strong> - ${order.officeNumber}<br>
+                ${itemsList}
+            `;
+
+            notification.classList.add('show');
+
+            // Play sound
+            const sound = document.getElementById('notificationSound');
+            sound.play().catch(e => console.log('Sound play failed:', e));
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        async function updateCurrentStats() {
+            const orders = await getOrders();
+            const statsBar = document.getElementById('currentStats');
+
+            const newCount = orders.filter(o => o.status === 'new').length;
+            const preparingCount = orders.filter(o => o.status === 'preparing').length;
+            const readyCount = orders.filter(o => o.status === 'ready').length;
+
+            const badge = document.getElementById('newBadge');
+            const newCountSpan = document.getElementById('newCount');
+
+            if (newCount > 0) {
+                badge.style.display = 'block';
+                newCountSpan.textContent = newCount;
+            } else {
+                badge.style.display = 'none';
+            }
+
+            statsBar.innerHTML = `
+                <div class="stat-card new">
+                    <div class="stat-number">${newCount}</div>
+                    <div class="stat-label">طلبات جديدة</div>
+                </div>
+                <div class="stat-card preparing">
+                    <div class="stat-number">${preparingCount}</div>
+                    <div class="stat-label">يتم التجهيز</div>
+                </div>
+                <div class="stat-card ready">
+                    <div class="stat-number">${readyCount}</div>
+                    <div class="stat-label">جاهز للتوصيل</div>
+                </div>
+            `;
+        }
+
+        async function loadOrders() {
+            const orders = await getOrders();
+            const grid = document.getElementById('ordersGrid');
+
+            await updateCurrentStats();
+
+            if (orders.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🍽️</div>
+                        <h3>مفيش طلبات حالياً</h3>
+                        <p>الطلبات الجديدة هتظهر هنا تلقائياً مع صوت تنبيه</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let filteredOrders = orders;
+
+            if (currentFilter === 'new') filteredOrders = orders.filter(o => o.status === 'new');
+            else if (currentFilter === 'preparing') filteredOrders = orders.filter(o => o.status === 'preparing');
+            else if (currentFilter === 'ready') filteredOrders = orders.filter(o => o.status === 'ready');
+
+            if (filteredOrders.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>مفيش طلبات بهذه الحالة</h3>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filteredOrders.sort((a, b) => b.id - a.id).map(order => {
+                const time = new Date(order.timestamp).toLocaleTimeString('ar-EG', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                let statusText = order.status === 'new' ? 'جديد' :
+                    order.status === 'preparing' ? 'يتجهز' : 'جاهز';
+
+                let statusClass = order.status === 'new' ? 'status-new' :
+                    order.status === 'preparing' ? 'status-preparing' : 'status-ready';
+
+                let actions = '';
+                if (order.status === 'new') {
+                    actions = `<button class="action-btn btn-preparing" onclick="updateOrderStatus(${order.id}, 'preparing')">🔥 ابدأ التجهيز</button>`;
+                } else if (order.status === 'preparing') {
+                    actions = `<button class="action-btn btn-ready" onclick="updateOrderStatus(${order.id}, 'ready')">✅ جاهز للتوصيل</button>`;
+                } else if (order.status === 'ready') {
+                    actions = `<button class="action-btn btn-delivered" onclick="updateOrderStatus(${order.id}, 'delivered')">🚀 تم التوصيل</button>`;
+                }
+
+                return `
+                    <div class="order-card ${order.status}">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <h3>${order.employeeName}</h3>
+                                <p>📍 ${order.officeNumber}</p>
+                            </div>
+                            <div class="order-meta">
+                                <div class="order-time">⏰ ${time}</div><br>
+                                <span class="order-status ${statusClass}">${statusText}</span>
+                            </div>
+                        </div>
+                        <div class="order-items">
+                            ${order.items.map(item => `
+                                <div class="order-item">
+                                    <span class="item-name">${item.item}</span>
+                                    <span class="item-qty">×${item.quantity}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="order-actions">
+                            ${actions}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterOrders(status) {
+            currentFilter = status;
+            const btns = document.querySelectorAll('#current-tab .filter-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            loadOrders();
+        }
+
+        // History Functions
+        async function getAllHistoryOrders() {
+            try {
+                const data = localStorage.getItem('buffet_orders');
+                const currentOrders = data ? JSON.parse(data) : [];
+
+                const historyData = localStorage.getItem('buffet_history');
+                const historyOrders = historyData ? JSON.parse(historyData) : [];
+
+                return [...currentOrders, ...historyOrders];
+            } catch (error) {
+                console.error('Error getting orders:', error);
+                return [];
+            }
+        }
+
+        function filterByDate(orders, filter) {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+            return orders.filter(order => {
+                const orderDate = new Date(order.timestamp);
+
+                switch (filter) {
+                    case 'today':
+                        return orderDate >= today;
+                    case 'week':
+                        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        return orderDate >= weekAgo;
+                    case 'month':
+                        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                        return orderDate >= monthAgo;
+                    case 'all':
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        function updateHistoryStats() {
+            const statsBar = document.getElementById('historyStats');
+            const total = historyOrders.length;
+            const delivered = historyOrders.filter(o => o.status === 'delivered').length;
+            const current = historyOrders.filter(o => o.status !== 'delivered').length;
+
+            statsBar.innerHTML = `
+                <div class="stat-card total">
+                    <div class="stat-number">${total}</div>
+                    <div class="stat-label">إجمالي الطلبات</div>
+                </div>
+                <div class="stat-card ready">
+                    <div class="stat-number">${delivered}</div>
+                    <div class="stat-label">تم التوصيل</div>
+                </div>
+                <div class="stat-card preparing">
+                    <div class="stat-number">${current}</div>
+                    <div class="stat-label">قيد التجهيز</div>
+                </div>
+            `;
+        }
+
+        function renderHistory() {
+            const content = document.getElementById('historyContent');
+
+            let filtered = historyOrders;
+            if (currentHistoryFilter !== 'all') {
+                filtered = historyOrders.filter(o => o.status === currentHistoryFilter);
+            }
+
+            if (filtered.length === 0) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>مفيش طلبات</h3>
+                        <p>مفيش طلبات بالفلتر الحالي</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            let html = `
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>التاريخ والوقت</th>
+                            <th>اسم الموظف</th>
+                            <th>المكتب</th>
+                            <th>الأصناف</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            filtered.forEach(order => {
+                const date = new Date(order.timestamp);
+                const dateStr = date.toLocaleDateString('ar-EG');
+                const timeStr = date.toLocaleTimeString('ar-EG', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                let statusText = '';
+                let statusClass = '';
+
+                switch (order.status) {
+                    case 'new':
+                        statusText = 'جديد';
+                        statusClass = 'status-new';
+                        break;
+                    case 'preparing':
+                        statusText = 'يتجهز';
+                        statusClass = 'status-preparing';
+                        break;
+                    case 'ready':
+                        statusText = 'جاهز';
+                        statusClass = 'status-ready';
+                        break;
+                    case 'delivered':
+                        statusText = 'تم التوصيل';
+                        statusClass = 'status-delivered';
+                        break;
+                }
+
+                const itemsHtml = order.items.map(item =>
+                    `<span class="item-tag">${item.item} ×${item.quantity}</span>`
+                ).join(' ');
+
+                html += `
+                    <tr>
+                        <td>${dateStr}<br>${timeStr}</td>
+                        <td><strong>${order.employeeName}</strong></td>
+                        <td>${order.officeNumber}</td>
+                        <td><div style="max-width: 300px;">${itemsHtml}</div></td>
+                        <td><span class="order-status ${statusClass}">${statusText}</span></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            content.innerHTML = html;
+        }
+
+        async function loadHistory() {
+            const dateFilter = document.getElementById('dateFilter').value;
+            allOrders = await getAllHistoryOrders();
+            historyOrders = filterByDate(allOrders, dateFilter);
+
+            updateHistoryStats();
+            renderHistory();
+        }
+
+        function filterHistory(status) {
+            currentHistoryFilter = status;
+            const btns = document.querySelectorAll('#history-tab .filter-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderHistory();
+        }
+
+        function switchMainTab(tab) {
+            document.querySelectorAll('.main-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+
+            if (tab === 'history') {
+                loadHistory();
+            }
+        }
+
+        function startPolling() {
+            pollingInterval = setInterval(async () => {
+                const orders = await getOrders();
+                const newOrdersCount = orders.filter(o => o.status === 'new').length;
+
+                if (newOrdersCount > lastOrderCount) {
+                    const newOrders = orders.filter(o => o.status === 'new').sort((a, b) => b.id - a.id);
+                    if (newOrders.length > 0) {
+                        showNotification(newOrders[0]);
+                    }
+                }
+
+                lastOrderCount = newOrdersCount;
+                await loadOrders();
+            }, 2000);
+        }
+
+        // Initialize
+        (async () => {
+            // Check authentication first
+            if (!checkAuth()) {
+                return;
+            }
+            
+            await loadOrders();
+            const orders = await getOrders();
+            lastOrderCount = orders.filter(o => o.status === 'new').length;
+            startPolling();
+        })();
+    </script>
+</body>
+
+</html>
