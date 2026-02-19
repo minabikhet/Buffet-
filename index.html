@@ -272,9 +272,6 @@
             }
         }
     </style>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 
 <body>
@@ -373,34 +370,6 @@
     </div>
 
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAhehi0m7CD8TU2PusKbXan7vfzuGYoSlE",
-            authDomain: "buffet-82ec0.firebaseapp.com",
-            databaseURL: "https://buffet-82ec0-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "buffet-82ec0",
-            storageBucket: "buffet-82ec0.firebasestorage.app",
-            messagingSenderId: "737817727386",
-            appId: "1:737817727386:web:e3b13235cb6017ac47aa23",
-            measurementId: "G-XL9C0ZQGRF"
-        };
-
-        // Initialize Firebase
-        let db = null;
-        let useFirebase = false;
-
-        try {
-            if (typeof firebase !== 'undefined') {
-                firebase.initializeApp(firebaseConfig);
-                db = firebase.database();
-                useFirebase = true;
-                console.log('✅ Firebase initialized successfully');
-            }
-        } catch (error) {
-            console.warn('⚠️ Firebase not available, using localStorage only:', error);
-            useFirebase = false;
-        }
-
         // Toggle password visibility
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
@@ -486,27 +455,8 @@
                 return;
             }
 
-            // Get employees from Firebase first, then localStorage
-            let employees = [];
-            
-            if (useFirebase && db) {
-                try {
-                    const snapshot = await db.ref('employees').once('value');
-                    const firebaseEmployees = snapshot.val();
-                    if (firebaseEmployees) {
-                        employees = Object.values(firebaseEmployees);
-                        // Sync to localStorage
-                        localStorage.setItem('buffet_employees', JSON.stringify(employees));
-                    }
-                } catch (error) {
-                    console.error('Firebase error, using localStorage:', error);
-                }
-            }
-            
-            // Fallback to localStorage if Firebase failed or no data
-            if (employees.length === 0) {
-                employees = JSON.parse(localStorage.getItem('buffet_employees') || '[]');
-            }
+            // Get employees from localStorage
+            const employees = JSON.parse(localStorage.getItem('buffet_employees') || '[]');
 
             // Find employee
             const employee = employees.find(emp => 
@@ -545,7 +495,7 @@
         });
 
         // Handle registration
-        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const name = document.getElementById('employeeName').value.trim();
@@ -553,24 +503,7 @@
             const username = document.getElementById('regUsername').value.trim();
             const password = document.getElementById('regPassword').value;
 
-            // Get employees from Firebase
-            let employees = [];
-            if (useFirebase && db) {
-                try {
-                    const snapshot = await db.ref('employees').once('value');
-                    const firebaseEmployees = snapshot.val();
-                    if (firebaseEmployees) {
-                        employees = Object.values(firebaseEmployees);
-                    }
-                } catch (error) {
-                    console.error('Firebase error:', error);
-                }
-            }
-            
-            // Fallback to localStorage
-            if (employees.length === 0) {
-                employees = JSON.parse(localStorage.getItem('buffet_employees') || '[]');
-            }
+            const employees = JSON.parse(localStorage.getItem('buffet_employees') || '[]');
 
             if (employees.some(emp => emp.username === username)) {
                 const errorMsg = document.getElementById('registerError');
@@ -592,17 +525,6 @@
                 createdAt: new Date().toISOString()
             };
 
-            // Save to Firebase
-            if (useFirebase && db) {
-                try {
-                    await db.ref('employees/' + newEmployee.id).set(newEmployee);
-                    console.log('✅ Employee saved to Firebase');
-                } catch (error) {
-                    console.error('Firebase error:', error);
-                }
-            }
-
-            // Also save to localStorage
             employees.push(newEmployee);
             localStorage.setItem('buffet_employees', JSON.stringify(employees));
 
