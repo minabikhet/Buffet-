@@ -312,9 +312,6 @@
             }
         }
     </style>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -399,105 +396,8 @@
     </div>
 
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAhehi0m7CD8TU2PusKbXan7vfzuGYoSlE",
-            authDomain: "buffet-82ec0.firebaseapp.com",
-            databaseURL: "https://buffet-82ec0-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "buffet-82ec0",
-            storageBucket: "buffet-82ec0.firebasestorage.app",
-            messagingSenderId: "737817727386",
-            appId: "1:737817727386:web:e3b13235cb6017ac47aa23",
-            measurementId: "G-XL9C0ZQGRF"
-        };
-
-        // Initialize Firebase
-        let db = null;
-        let useFirebase = false;
-
-        try {
-            if (typeof firebase !== 'undefined') {
-                firebase.initializeApp(firebaseConfig);
-                db = firebase.database();
-                useFirebase = true;
-                console.log('✅ Firebase initialized in admin panel');
-            }
-        } catch (error) {
-            console.warn('⚠️ Firebase not available:', error);
-            useFirebase = false;
-        }
-
         let allOrders = [];
         let filteredOrders = [];
-        let lastOrderCount = 0;
-
-        // Notification Sound
-        function playNotificationSound() {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
-            for (let i = 0; i < 3; i++) {
-                setTimeout(() => {
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-                    
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-                    
-                    oscillator.frequency.value = 800;
-                    oscillator.type = 'sine';
-                    
-                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-                    
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + 0.2);
-                }, i * 300);
-            }
-        }
-
-        function showNotification(order) {
-            playNotificationSound();
-            
-            if ('Notification' in window && Notification.permission === 'granted') {
-                const itemsList = order.items.map(item => `${item.item} ×${item.quantity}`).join(', ');
-                new Notification('🔔 طلب جديد!', {
-                    body: `${order.employeeName} - ${order.officeNumber}\n${itemsList}`,
-                    icon: '🍽️',
-                    requireInteraction: false
-                });
-            }
-        }
-
-        function requestNotificationPermission() {
-            if ('Notification' in window && Notification.permission === 'default') {
-                Notification.requestPermission();
-            }
-        }
-
-        // Setup Firebase listener
-        function setupFirebaseListener() {
-            if (useFirebase && db) {
-                console.log('🔥 Setting up Firebase listener in admin panel...');
-                
-                db.ref('orders').on('child_added', (snapshot) => {
-                    const order = snapshot.val();
-                    const now = Date.now();
-                    const orderTime = new Date(order.timestamp).getTime();
-                    
-                    if (now - orderTime < 10000) {
-                        console.log('🔔 New order for admin:', order);
-                        showNotification(order);
-                    }
-                    
-                    loadOrders();
-                });
-                
-                db.ref('orders').on('child_changed', () => loadOrders());
-                db.ref('orders').on('child_removed', () => loadOrders());
-                
-                console.log('✅ Firebase listener active in admin panel');
-            }
-        }
 
         // Check admin authentication
         function checkAuth() {
@@ -524,36 +424,12 @@
         }
 
         // Load orders
-        async function loadOrders() {
-            try {
-                let orders = [];
-                
-                // Try Firebase first
-                if (useFirebase && db) {
-                    try {
-                        const snapshot = await db.ref('orders').once('value');
-                        const data = snapshot.val();
-                        if (data) {
-                            orders = Object.values(data);
-                            localStorage.setItem('buffet_orders', JSON.stringify(orders));
-                        }
-                    } catch (error) {
-                        console.error('Firebase error:', error);
-                    }
-                }
-                
-                // Fallback to localStorage
-                if (orders.length === 0) {
-                    orders = JSON.parse(localStorage.getItem('buffet_orders') || '[]');
-                }
-
-                allOrders = orders.sort((a, b) => b.id - a.id);
-                filteredOrders = [...allOrders];
-                displayOrders(filteredOrders);
-                updateStats(filteredOrders);
-            } catch (error) {
-                console.error('Error loading orders:', error);
-            }
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('buffet_orders') || '[]');
+            allOrders = orders.sort((a, b) => b.id - a.id); // Sort by newest first
+            filteredOrders = [...allOrders];
+            displayOrders(filteredOrders);
+            updateStats(filteredOrders);
         }
 
         // Display orders in table
@@ -693,8 +569,6 @@
         // Initialize on page load
         window.addEventListener('load', function() {
             if (checkAuth()) {
-                requestNotificationPermission();
-                setupFirebaseListener();
                 loadOrders();
             }
         });
