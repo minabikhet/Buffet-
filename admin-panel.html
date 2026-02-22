@@ -353,7 +353,17 @@
     </div>
 
     <div class="filters">
-        <div class="filter-row">
+        <div class="filter-row" style="margin-bottom: 15px;">
+            <div class="filter-group">
+                <label>اختيار سريع</label>
+                <select id="quickDateFilter" onchange="applyQuickDate()" style="padding: 10px; border: 2px solid #ddd; border-radius: 8px; width: 100%;">
+                    <option value="">كل الفترة</option>
+                    <option value="today">اليوم</option>
+                    <option value="yesterday">أمس</option>
+                    <option value="week">آخر 7 أيام</option>
+                    <option value="month">آخر 30 يوم</option>
+                </select>
+            </div>
             <div class="filter-group">
                 <label>اسم الموظف</label>
                 <input type="text" id="filterEmployee" placeholder="ابحث عن موظف...">
@@ -362,6 +372,8 @@
                 <label>القسم</label>
                 <input type="text" id="filterDepartment" placeholder="ابحث عن قسم...">
             </div>
+        </div>
+        <div class="filter-row">
             <div class="filter-group">
                 <label>من تاريخ</label>
                 <input type="date" id="filterFromDate">
@@ -371,7 +383,7 @@
                 <input type="date" id="filterToDate">
             </div>
         </div>
-        <button class="btn btn-primary" onclick="applyFilters()" style="width: 100%;">🔍 تطبيق الفلاتر</button>
+        <button class="btn btn-primary" onclick="applyFilters()" style="width: 100%; margin-top: 10px;">🔍 تطبيق الفلاتر</button>
     </div>
 
     <div class="orders-container">
@@ -641,6 +653,43 @@
         }
 
         // Apply filters
+        // Quick date filter
+        function applyQuickDate() {
+            const quickFilter = document.getElementById('quickDateFilter').value;
+            const today = new Date();
+            let fromDate = null;
+            let toDate = today.toISOString().split('T')[0];
+
+            switch(quickFilter) {
+                case 'today':
+                    fromDate = toDate;
+                    break;
+                case 'yesterday':
+                    const yesterday = new Date(today);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    fromDate = yesterday.toISOString().split('T')[0];
+                    toDate = fromDate;
+                    break;
+                case 'week':
+                    const weekAgo = new Date(today);
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    fromDate = weekAgo.toISOString().split('T')[0];
+                    break;
+                case 'month':
+                    const monthAgo = new Date(today);
+                    monthAgo.setDate(monthAgo.getDate() - 30);
+                    fromDate = monthAgo.toISOString().split('T')[0];
+                    break;
+                default:
+                    fromDate = '';
+                    toDate = '';
+            }
+
+            document.getElementById('filterFromDate').value = fromDate || '';
+            document.getElementById('filterToDate').value = toDate || '';
+            applyFilters();
+        }
+
         function applyFilters() {
             const employeeFilter = document.getElementById('filterEmployee').value.toLowerCase();
             const departmentFilter = document.getElementById('filterDepartment').value.toLowerCase();

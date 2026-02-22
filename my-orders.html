@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#667eea">
+    <title>طلباتي - نظام البوفيه</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .orders-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .order-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-right: 5px solid #ddd;
+            transition: all 0.3s;
+        }
+
+        .order-card:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .order-card.new {
+            border-right-color: #ff9800;
+            background: #fff8e1;
+        }
+
+        .order-card.preparing {
+            border-right-color: #2196F3;
+            background: #e3f2fd;
+        }
+
+        .order-card.ready {
+            border-right-color: #4CAF50;
+            background: #e8f5e9;
+        }
+
+        .order-card.delivered {
+            border-right-color: #9E9E9E;
+            background: #f5f5f5;
+            opacity: 0.8;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .order-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .order-time {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-new {
+            background: #ff9800;
+            color: white;
+        }
+
+        .status-preparing {
+            background: #2196F3;
+            color: white;
+        }
+
+        .status-ready {
+            background: #4CAF50;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .status-delivered {
+            background: #9E9E9E;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .order-items {
+            margin: 15px 0;
+        }
+
+        .order-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-comment {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+            margin-top: 4px;
+        }
+
+        .cancel-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .cancel-btn:hover {
+            background: #c0392b;
+        }
+
+        .cancel-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .order-card {
+                padding: 15px;
+            }
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>📋 طلباتي</h1>
+                <p id="employeeInfo" style="color: #666; margin-top: 5px;"></p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="window.location.href='employee-order.html'">➕ طلب جديد</button>
+                <button class="btn btn-danger" onclick="logout()">🚪 تسجيل خروج</button>
+            </div>
+        </div>
+
+        <div class="orders-container">
+            <h2 style="margin-bottom: 20px; color: #333;">طلباتي الحالية</h2>
+            <div id="ordersContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">⏳</div>
+                    <h3>جاري التحميل...</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAhehi0m7CD8TU2PusKbXan7vfzuGYoSlE",
+            authDomain: "buffet-82ec0.firebaseapp.com",
+            databaseURL: "https://buffet-82ec0-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "buffet-82ec0",
+            storageBucket: "buffet-82ec0.firebasestorage.app",
+            messagingSenderId: "737817727386",
+            appId: "1:737817727386:web:e3b13235cb6017ac47aa23",
+            measurementId: "G-XL9C0ZQGRF"
+        };
+
+        // Initialize Firebase
+        let db = null;
+        let useFirebase = false;
+
+        try {
+            if (typeof firebase !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                useFirebase = true;
+                console.log('✅ Firebase initialized');
+            }
+        } catch (error) {
+            console.warn('⚠️ Firebase not available:', error);
+            useFirebase = false;
+        }
+
+        let currentEmployee = null;
+
+        function checkAuth() {
+            const employeeData = sessionStorage.getItem('current_employee');
+            if (!employeeData) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            currentEmployee = JSON.parse(employeeData);
+            
+            if (currentEmployee.isAdmin) {
+                window.location.href = 'admin-panel.html';
+                return false;
+            }
+            
+            if (currentEmployee.isBuffet) {
+                window.location.href = 'buffet-system.html';
+                return false;
+            }
+            
+            return true;
+        }
+
+        function logout() {
+            if (confirm('هل تريد تسجيل الخروج؟')) {
+                sessionStorage.removeItem('current_employee');
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function loadMyOrders() {
+            try {
+                let orders = [];
+                
+                // Try Firebase first
+                if (useFirebase && db) {
+                    try {
+                        const snapshot = await db.ref('orders').once('value');
+                        const data = snapshot.val();
+                        if (data) {
+                            orders = Object.values(data);
+                        }
+                    } catch (error) {
+                        console.error('Firebase error:', error);
+                    }
+                }
+                
+                // Fallback to localStorage
+                if (orders.length === 0) {
+                    const data = localStorage.getItem('buffet_orders');
+                    orders = data ? JSON.parse(data) : [];
+                }
+
+                // Filter my orders only
+                const myOrders = orders.filter(order => 
+                    order.employeeUsername === currentEmployee.username
+                ).sort((a, b) => b.id - a.id);
+
+                displayOrders(myOrders);
+                
+                // Setup real-time listener
+                if (useFirebase && db) {
+                    db.ref('orders').on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            const allOrders = Object.values(data);
+                            const myOrders = allOrders.filter(order => 
+                                order.employeeUsername === currentEmployee.username
+                            ).sort((a, b) => b.id - a.id);
+                            displayOrders(myOrders);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            }
+        }
+
+        function displayOrders(orders) {
+            const container = document.getElementById('ordersContainer');
+            
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>ليس لديك طلبات حالياً</h3>
+                        <p>اضغط "طلب جديد" لإضافة طلب</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = orders.map(order => {
+                const date = new Date(order.timestamp);
+                const timeStr = date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = date.toLocaleDateString('ar-EG');
+
+                let statusText = '';
+                let statusClass = '';
+                let canCancel = false;
+
+                switch (order.status) {
+                    case 'new':
+                        statusText = '🆕 جديد';
+                        statusClass = 'status-new';
+                        canCancel = true;
+                        break;
+                    case 'preparing':
+                        statusText = '👨‍🍳 يتجهز';
+                        statusClass = 'status-preparing';
+                        canCancel = false;
+                        break;
+                    case 'ready':
+                        statusText = '✅ جاهز للاستلام';
+                        statusClass = 'status-ready';
+                        canCancel = false;
+                        break;
+                    case 'delivered':
+                        statusText = '✔️ تم التسليم';
+                        statusClass = 'status-delivered';
+                        canCancel = false;
+                        break;
+                }
+
+                const itemsHtml = order.items.map(item => `
+                    <div class="order-item">
+                        <strong>${item.item}</strong> × ${item.quantity}
+                        ${item.comment ? `<div class="item-comment">💬 ${item.comment}</div>` : ''}
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="order-card ${order.status}">
+                        <div class="order-header">
+                            <div>
+                                <div class="order-id">طلب #${order.id}</div>
+                                <div class="order-time">⏰ ${dateStr} - ${timeStr}</div>
+                            </div>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="order-items">
+                            ${itemsHtml}
+                        </div>
+                        ${canCancel ? `
+                            <button class="cancel-btn" onclick="cancelOrder(${order.id})">
+                                ❌ إلغاء الطلب
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function cancelOrder(orderId) {
+            if (!confirm('هل أنت متأكد من إلغاء هذا الطلب؟')) {
+                return;
+            }
+
+            try {
+                // Remove from Firebase
+                if (useFirebase && db) {
+                    await db.ref('orders/' + orderId).remove();
+                    console.log('✅ Order cancelled in Firebase');
+                }
+
+                // Remove from localStorage
+                const data = localStorage.getItem('buffet_orders');
+                if (data) {
+                    let orders = JSON.parse(data);
+                    orders = orders.filter(o => o.id !== orderId);
+                    localStorage.setItem('buffet_orders', JSON.stringify(orders));
+                }
+
+                alert('✅ تم إلغاء الطلب بنجاح');
+                loadMyOrders();
+            } catch (error) {
+                console.error('Error cancelling order:', error);
+                alert('❌ حدث خطأ في إلغاء الطلب');
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', function() {
+            if (checkAuth()) {
+                document.getElementById('employeeInfo').textContent = 
+                    `${currentEmployee.name} - ${currentEmployee.department}`;
+                loadMyOrders();
+            }
+        });
+    </script>
+</body>
+</html>

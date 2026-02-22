@@ -1123,8 +1123,20 @@
         }
 
         async function loadOrders() {
-            const orders = await getOrders();
+            const allOrders = await getOrders();
             const grid = document.getElementById('ordersGrid');
+
+            // Filter to today's orders only
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const orders = allOrders.filter(order => {
+                const orderDate = new Date(order.timestamp);
+                orderDate.setHours(0, 0, 0, 0);
+                return orderDate.getTime() === today.getTime();
+            });
+
+            console.log('📊 اليوم:', orders.length, 'طلب | الكل:', allOrders.length);
 
             await updateCurrentStats();
 
@@ -1132,7 +1144,7 @@
                 grid.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">🍽️</div>
-                        <h3>مفيش طلبات حالياً</h3>
+                        <h3>مفيش طلبات اليوم</h3>
                         <p>الطلبات الجديدة هتظهر هنا تلقائياً مع صوت تنبيه</p>
                     </div>
                 `;
