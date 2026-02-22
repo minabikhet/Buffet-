@@ -1193,6 +1193,7 @@
                                 <div class="order-item">
                                     <span class="item-name">${item.item}</span>
                                     <span class="item-qty">×${item.quantity}</span>
+                                    ${item.comment ? `<div style="font-size: 12px; color: #666; margin-top: 4px; font-style: italic;">💬 ${item.comment}</div>` : ''}
                                 </div>
                             `).join('')}
                         </div>

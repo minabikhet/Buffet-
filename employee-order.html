@@ -276,6 +276,46 @@
             font-weight: bold;
         }
 
+        .comment-control {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .menu-item.selected .comment-control {
+            display: block;
+        }
+
+        .comment-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+            transition: all 0.3s;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .comment-input::placeholder {
+            color: #999;
+        }
+
         .submit-btn {
             width: 100%;
             padding: 18px;
@@ -661,6 +701,10 @@
                             <input type="number" class="qty-input" value="1" min="1" max="10" readonly>
                             <button type="button" class="qty-btn" onclick="changeQty(this, 1)">+</button>
                         </div>
+                        <div class="comment-control">
+                            <label class="comment-label">💬 تعليق أو طلب خاص (اختياري):</label>
+                            <textarea class="comment-input" placeholder="مثال: بدون سكر، سكر خفيف، سخن جداً..."></textarea>
+                        </div>
                     `;
 
                     const checkbox = itemDiv.querySelector('.item-checkbox');
@@ -697,9 +741,16 @@
 
             const selectedItems = [];
             document.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
+                const menuItem = checkbox.closest('.menu-item');
                 const item = checkbox.dataset.item;
-                const qty = checkbox.closest('.menu-item').querySelector('.qty-input').value;
-                selectedItems.push({ item, quantity: parseInt(qty) });
+                const qty = menuItem.querySelector('.qty-input').value;
+                const comment = menuItem.querySelector('.comment-input').value.trim();
+                
+                selectedItems.push({ 
+                    item, 
+                    quantity: parseInt(qty),
+                    comment: comment || '' // إضافة التعليق
+                });
             });
 
             if (selectedItems.length === 0) {
