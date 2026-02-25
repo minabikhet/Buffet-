@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#2c3e50">
-    <title>لوحة تحكم الإدارة</title>
+    <title>Admin Panel </title>
     <style>
         * {
             margin: 0;
@@ -322,32 +322,35 @@
 <body>
     <div class="header">
         <div>
-            <div style="font-size: 36px; font-weight: bold; color: #000; letter-spacing: 3px; font-family: 'GeoHeavymetric 231  BT','Geometr231 Hv BT', Arial, sans-serif; line-height: 1;">MARMONIL</div>
-            <div style="font-size: 16px; color: #666; font-weight: 500; letter-spacing: 2px; margin-top: 3px;">Buffet</div>
-            <h1 style="margin-top: 10px;">📊 لوحة تحكم الإدارة</h1>
-            <p style="color: #666; margin-top: 5px;">مرحباً بك في نظام إدارة البوفيه</p>
+            <div
+                style="font-size: 36px; font-weight: bold; color: #000; letter-spacing: 3px; font-family: 'GeoHeavymetric 231  BT','Geometr231 Hv BT', Arial, sans-serif; line-height: 1;">
+                MARMONIL</div>
+            <div style="font-size: 16px; color: #666; font-weight: 500; letter-spacing: 2px; margin-top: 3px;">Buffet
+            </div>
+            <h1 style="margin-top: 10px;">📊 Admin Panel</h1>
+            <p style="color: #666; margin-top: 5px;">Welcome to the Buffet Management System</p>
         </div>
         <div class="header-buttons">
-            <button class="btn btn-primary" onclick="exportToExcel()">📥 تصدير إلى Excel</button>
-            <button class="btn btn-danger" onclick="logout()">🚪 تسجيل خروج</button>
+            <button class="btn btn-primary" onclick="exportToExcel()">📥 Export to Excel</button>
+            <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
         </div>
     </div>
 
     <div class="stats-container">
         <div class="stat-card">
-            <h3>إجمالي الطلبات</h3>
+            <h3>Total Orders</h3>
             <div class="number" id="totalOrders">0</div>
         </div>
         <div class="stat-card">
-            <h3>الموظفين النشطين</h3>
+            <h3>Active Employees</h3>
             <div class="number" id="activeEmployees">0</div>
         </div>
         <div class="stat-card">
-            <h3>طلبات اليوم</h3>
+            <h3>Today Orders</h3>
             <div class="number" id="todayOrders">0</div>
         </div>
         <div class="stat-card">
-            <h3>إجمالي الأصناف</h3>
+            <h3>Total Items</h3>
             <div class="number" id="totalItems">0</div>
         </div>
     </div>
@@ -355,56 +358,58 @@
     <div class="filters">
         <div class="filter-row" style="margin-bottom: 15px;">
             <div class="filter-group">
-                <label>اختيار سريع</label>
-                <select id="quickDateFilter" onchange="applyQuickDate()" style="padding: 10px; border: 2px solid #ddd; border-radius: 8px; width: 100%;">
-                    <option value="">كل الفترة</option>
-                    <option value="today">اليوم</option>
-                    <option value="yesterday">أمس</option>
-                    <option value="week">آخر 7 أيام</option>
-                    <option value="month">آخر 30 يوم</option>
+                <label>Quick Filter</label>
+                <select id="quickDateFilter" onchange="applyQuickDate()"
+                    style="padding: 10px; border: 2px solid #ddd; border-radius: 8px; width: 100%;">
+                    <option value="">All Period</option>
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="week">Last 7 Days</option>
+                    <option value="month">Last 30 Days</option>
                 </select>
             </div>
             <div class="filter-group">
-                <label>اسم الموظف</label>
-                <input type="text" id="filterEmployee" placeholder="ابحث عن موظف...">
+                <label>Employee Name</label>
+                <input type="text" id="filterEmployee" placeholder="Search Employee...">
             </div>
             <div class="filter-group">
-                <label>القسم</label>
-                <input type="text" id="filterDepartment" placeholder="ابحث عن قسم...">
+                <label>Department</label>
+                <input type="text" id="filterDepartment" placeholder="Search Department...">
             </div>
         </div>
         <div class="filter-row">
             <div class="filter-group">
-                <label>من تاريخ</label>
+                <label>From Date</label>
                 <input type="date" id="filterFromDate">
             </div>
             <div class="filter-group">
-                <label>إلى تاريخ</label>
+                <label>To Date</label>
                 <input type="date" id="filterToDate">
             </div>
         </div>
-        <button class="btn btn-primary" onclick="applyFilters()" style="width: 100%; margin-top: 10px;">🔍 تطبيق الفلاتر</button>
+        <button class="btn btn-primary" onclick="applyFilters()" style="width: 100%; margin-top: 10px;">🔍 Apply
+            Filters</button>
     </div>
 
     <div class="orders-container">
         <div class="orders-header">
-            <h2>📋 سجل الطلبات</h2>
-            <span id="ordersCount" style="color: #666;">عدد الطلبات: 0</span>
+            <h2>📋 Orders List</h2>
+            <span id="ordersCount" style="color: #666;">Number of Orders: 0</span>
         </div>
         <table class="orders-table">
             <thead>
                 <tr>
-                    <th>رقم الطلب</th>
-                    <th>اسم الموظف</th>
-                    <th>القسم</th>
-                    <th>الأصناف المطلوبة</th>
-                    <th>التاريخ</th>
-                    <th>الوقت</th>
+                    <th>Order Number</th>
+                    <th>Employee Name</th>
+                    <th>Department</th>
+                    <th>Required Items</th>
+                    <th>Date</th>
+                    <th>Time</th>
                 </tr>
             </thead>
             <tbody id="ordersTableBody">
                 <tr>
-                    <td colspan="6" class="no-orders">لا توجد طلبات حتى الآن</td>
+                    <td colspan="6" class="no-orders">No orders found yet</td>
                 </tr>
             </tbody>
         </table>
@@ -445,21 +450,21 @@
         // Notification Sound
         function playNotificationSound() {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
+
             for (let i = 0; i < 3; i++) {
                 setTimeout(() => {
                     const oscillator = audioContext.createOscillator();
                     const gainNode = audioContext.createGain();
-                    
+
                     oscillator.connect(gainNode);
                     gainNode.connect(audioContext.destination);
-                    
+
                     oscillator.frequency.value = 800;
                     oscillator.type = 'sine';
-                    
+
                     gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
                     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-                    
+
                     oscillator.start(audioContext.currentTime);
                     oscillator.stop(audioContext.currentTime + 0.2);
                 }, i * 300);
@@ -468,10 +473,10 @@
 
         function showNotification(order) {
             playNotificationSound();
-            
+
             if ('Notification' in window && Notification.permission === 'granted') {
                 const itemsList = order.items.map(item => `${item.item} ×${item.quantity}`).join(', ');
-                new Notification('🔔 طلب جديد!', {
+                new Notification('🔔 New Order!', {
                     body: `${order.employeeName} - ${order.officeNumber}\n${itemsList}`,
                     icon: '🍽️',
                     requireInteraction: false
@@ -489,23 +494,23 @@
         function setupFirebaseListener() {
             if (useFirebase && db) {
                 console.log('🔥 Setting up Firebase listener in admin panel...');
-                
+
                 db.ref('orders').on('child_added', (snapshot) => {
                     const order = snapshot.val();
                     const now = Date.now();
                     const orderTime = new Date(order.timestamp).getTime();
-                    
+
                     if (now - orderTime < 10000) {
                         console.log('🔔 New order for admin:', order);
                         showNotification(order);
                     }
-                    
+
                     loadOrders();
                 });
-                
+
                 db.ref('orders').on('child_changed', () => loadOrders());
                 db.ref('orders').on('child_removed', () => loadOrders());
-                
+
                 console.log('✅ Firebase listener active in admin panel');
             }
         }
@@ -519,7 +524,7 @@
             }
             const employee = JSON.parse(employeeData);
             if (!employee.isAdmin) {
-                alert('⚠️ غير مصرح لك بالدخول لهذه الصفحة');
+                alert('⚠️ You are not authorized to access this page');
                 window.location.href = 'index.html';
                 return false;
             }
@@ -528,7 +533,7 @@
 
         // Logout
         function logout() {
-            if (confirm('هل تريد تسجيل الخروج؟')) {
+            if (confirm('⚠️ Do you want to logout?')) {
                 sessionStorage.removeItem('current_employee');
                 window.location.href = 'index.html';
             }
@@ -539,7 +544,7 @@
             try {
                 let orders = [];
                 let history = [];
-                
+
                 // Try Firebase first
                 if (useFirebase && db) {
                     try {
@@ -550,7 +555,7 @@
                             orders = Object.values(ordersData);
                             console.log('✅ Loaded', orders.length, 'orders from Firebase');
                         }
-                        
+
                         // Get history
                         const historySnapshot = await db.ref('history').once('value');
                         const historyData = historySnapshot.val();
@@ -558,7 +563,7 @@
                             history = Object.values(historyData);
                             console.log('✅ Loaded', history.length, 'history from Firebase');
                         }
-                        
+
                         // Sync to localStorage
                         localStorage.setItem('buffet_orders', JSON.stringify(orders));
                         localStorage.setItem('buffet_history', JSON.stringify(history));
@@ -566,14 +571,14 @@
                         console.error('❌ Firebase error:', error);
                     }
                 }
-                
+
                 // Fallback to localStorage if Firebase failed or no data
                 if (orders.length === 0) {
                     const ordersData = localStorage.getItem('buffet_orders');
                     orders = ordersData ? JSON.parse(ordersData) : [];
                     console.log('📦 Loaded', orders.length, 'orders from localStorage');
                 }
-                
+
                 if (history.length === 0) {
                     const historyData = localStorage.getItem('buffet_history');
                     history = historyData ? JSON.parse(historyData) : [];
@@ -583,24 +588,24 @@
                 // Combine orders and history
                 allOrders = [...orders, ...history].sort((a, b) => b.id - a.id);
                 filteredOrders = [...allOrders];
-                
+
                 console.log('📊 Total orders displayed:', allOrders.length);
-                
+
                 displayOrders(filteredOrders);
                 updateStats(filteredOrders);
             } catch (error) {
                 console.error('❌ Error loading orders:', error);
-                alert('حدث خطأ في تحميل الطلبات');
+                alert('error loading orders');
             }
         }
 
         // Display orders in table
         function displayOrders(orders) {
             const tbody = document.getElementById('ordersTableBody');
-            document.getElementById('ordersCount').textContent = `عدد الطلبات: ${orders.length}`;
+            document.getElementById('ordersCount').textContent = `Number of orders: ${orders.length}`;
 
             if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="no-orders">لا توجد طلبات تطابق الفلاتر</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="no-orders">No orders found</td></tr>';
                 return;
             }
 
@@ -660,7 +665,7 @@
             let fromDate = null;
             let toDate = today.toISOString().split('T')[0];
 
-            switch(quickFilter) {
+            switch (quickFilter) {
                 case 'today':
                     fromDate = toDate;
                     break;
@@ -726,7 +731,7 @@
         // Export to Excel
         function exportToExcel() {
             if (filteredOrders.length === 0) {
-                alert('⚠️ لا توجد بيانات للتصدير');
+                alert('⚠️ No data to export');
                 return;
             }
 
@@ -736,13 +741,13 @@
                 const items = order.items.map(item => `${item.item} (${item.quantity})`).join(', ');
 
                 return {
-                    'رقم الطلب': order.id,
-                    'اسم الموظف': order.employeeName,
-                    'القسم': order.officeNumber,
-                    'الأصناف المطلوبة': items,
-                    'التاريخ': date.toLocaleDateString('ar-EG'),
-                    'الوقت': date.toLocaleTimeString('ar-EG'),
-                    'عدد الأصناف': order.items.reduce((sum, item) => sum + item.quantity, 0)
+                    'Order Number': order.id,
+                    'Employee Name': order.employeeName,
+                    'Department': order.officeNumber,
+                    'Items Required': items,
+                    'Date': date.toLocaleDateString('ar-EG'),
+                    'Time': date.toLocaleTimeString('ar-EG'),
+                    'Total Items': order.items.reduce((sum, item) => sum + item.quantity, 0)
                 };
             });
 
@@ -761,7 +766,7 @@
                 { wch: 12 }   // Total items
             ];
 
-            XLSX.utils.book_append_sheet(wb, ws, 'طلبات البوفيه');
+            XLSX.utils.book_append_sheet(wb, ws, 'Buffet Orders');
 
             // Generate filename with current date
             const filename = `buffet_orders_${new Date().toISOString().split('T')[0]}.xlsx`;
@@ -771,7 +776,7 @@
         }
 
         // Initialize on page load
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             if (checkAuth()) {
                 requestNotificationPermission();
                 setupFirebaseListener();

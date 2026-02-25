@@ -442,7 +442,7 @@
                 padding: 10px;
             }
 
-            .container > div:first-child {
+            .container>div:first-child {
                 flex-direction: column;
                 gap: 10px;
             }
@@ -542,13 +542,19 @@
 
 <body>
     <div class="container">
-        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div
+            style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; gap: 10px; align-items: center;">
-                <span id="welcomeMessage" style="color: white; font-weight: bold; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 5px;"></span>
+                <span id="welcomeMessage"
+                    style="color: white; font-weight: bold; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 5px;"></span>
             </div>
             <div style="display: flex; gap: 10px;">
-                <button onclick="window.location.href='my-orders.html'" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">📋 طلباتي</button>
-                <button onclick="logout()" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">🚪 تسجيل خروج</button>
+                <button onclick="window.location.href='my-orders.html'"
+                    style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">📋
+                    طلباتي</button>
+                <button onclick="logout()"
+                    style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">🚪
+                    تسجيل خروج</button>
             </div>
         </div>
         <div class="order-form">
@@ -556,7 +562,8 @@
                 <div
                     style="font-size: 100px; font-weight: bold; color: #000000; padding-bottom: 0px; letter-spacing: 8px; font-family: 'GeoHeavymetric 231  BT','Geometr231 Hv BT', 'Geometric 231', Arial, sans-serif; line-height: 1;">
                     MARMONIL</div>
-                <div style="font-size: 32px; color: #666; margin-top: 5px; font-weight: 500; letter-spacing: 3px;">Buffet</div>
+                <div style="font-size: 32px; color: #666; margin-top: 5px; font-weight: 500; letter-spacing: 3px;">
+                    Buffet</div>
             </div>
             <div class="form-header">
                 <h1>🍽️ Request from the buffet</h1>
@@ -564,10 +571,11 @@
             </div>
 
             <form id="orderForm">
-                <div class="form-group" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                <div class="form-group"
+                    style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 20px; border-radius: 10px; margin-bottom: 30px;">
                     <p style="text-align: center; color: #333; font-size: 18px;">
-                        <strong>الموظف:</strong> <span id="displayEmployeeName"></span><br>
-                        <strong>القسم:</strong> <span id="displayDepartment"></span>
+                        <strong>Employee:</strong> <span id="displayEmployeeName"></span><br>
+                        <strong>Department:</strong> <span id="displayDepartment"></span>
                     </p>
                 </div>
 
@@ -627,24 +635,24 @@
                 return false;
             }
             currentEmployee = JSON.parse(employeeData);
-            
+
             // Redirect admins to admin panel
             if (currentEmployee.isAdmin) {
                 window.location.href = 'admin-panel.html';
                 return false;
             }
-            
+
             // Redirect buffet workers to buffet system
             if (currentEmployee.isBuffet || (currentEmployee.department && currentEmployee.department.toLowerCase() === 'بوفيه')) {
                 window.location.href = 'buffet-system.html';
                 return false;
             }
-            
+
             return true;
         }
 
         function logout() {
-            if (confirm('هل تريد تسجيل الخروج؟')) {
+            if (confirm('⚠️ Do you want to logout?')) {
                 sessionStorage.removeItem('current_employee');
                 window.location.href = 'index.html';
             }
@@ -653,7 +661,7 @@
         // Initialize employee info
         function initEmployeeInfo() {
             if (currentEmployee) {
-                document.getElementById('welcomeMessage').textContent = `مرحباً ${currentEmployee.name}`;
+                document.getElementById('welcomeMessage').textContent = `Welcome ${currentEmployee.name}`;
                 document.getElementById('displayEmployeeName').textContent = currentEmployee.name;
                 document.getElementById('displayDepartment').textContent = currentEmployee.department;
             }
@@ -662,27 +670,27 @@
         // Menu Data
         const menuData = {
             hotDrinks: [
-                { name: 'مياة', icon: '🥛' },
-                { name: 'شاي', icon: '🍵' },
-                { name: 'شاي بالحليب', icon: '🥛' },
-                { name: 'شاي أخضر', icon: '🍵' },
-                { name: 'شاي بالنعناع', icon: '🍵' },
-                { name: 'نعناع', icon: '🍃' },
-                { name: 'ينسون', icon: '⭐' },
-                { name: 'قهوة سادة', icon: '☕' },
-                { name: 'قهوة مانو', icon: '☕' },
-                { name: 'قهوة مظبوط', icon: '☕' },
-                { name: 'قهوة زيادة', icon: '☕' },
-                { name: 'قهوة سادة بالحليب', icon: '🥛' },
-                { name: 'قهوة مانو بالحليب', icon: '🥛' },
-                { name: 'قهوة مظبوط بالحليب', icon: '🥛' },
-                { name: 'قهوة بالحليب زيادة', icon: '🥛' },
-                { name: ' نسكافيه بلاك', icon: '☕' },
-                { name: 'نسكافيه بالحليب', icon: '🥛' },
-                { name: 'فلات وايت', icon: '☕' },
-                { name: 'لاتيه', icon: '☕' },
-                { name: 'موكا', icon: '☕' },
-                { name: 'كابتشينو', icon: '☕' }
+                { name: 'Water', icon: '🥛' },
+                { name: 'Tea', icon: '🍵' },
+                { name: 'Tea with Milk', icon: '🥛' },
+                { name: 'Green Tea', icon: '🍵' },
+                { name: 'Tea with Honey', icon: '🍵' },
+                { name: 'Honey', icon: '🍃' },
+                { name: 'Younson', icon: '⭐' },
+                { name: 'Coffee Sada', icon: '☕' },
+                { name: 'Coffee Mano', icon: '☕' },
+                { name: 'Coffee Mazboot', icon: '☕' },
+                { name: 'Coffee Increase', icon: '☕' },
+                { name: 'Coffee Sada with Milk', icon: '🥛' },
+                { name: 'Coffee Mano with Milk', icon: '🥛' },
+                { name: 'Coffee Mazboot with Milk', icon: '🥛' },
+                { name: 'Coffee Increase with Milk', icon: '🥛' },
+                { name: 'Black Coffee', icon: '☕' },
+                { name: 'Coffee with Milk', icon: '🥛' },
+                { name: 'White Coffee', icon: '☕' },
+                { name: 'Latte', icon: '☕' },
+                { name: 'Mocha', icon: '☕' },
+                { name: 'Capuchino', icon: '☕' }
             ]
         };
 
@@ -705,8 +713,8 @@
                             <button type="button" class="qty-btn" onclick="changeQty(this, 1)">+</button>
                         </div>
                         <div class="comment-control">
-                            <label class="comment-label">💬 تعليق أو طلب خاص (اختياري):</label>
-                            <textarea class="comment-input" placeholder="مثال: بدون سكر، سكر خفيف، سخن جداً..."></textarea>
+                            <label class="comment-label">💬 Comment or Special Request (optional):</label>
+                            <textarea class="comment-input" placeholder="Example: without sugar, light sugar, very hot..."></textarea>
                         </div>
                     `;
 
@@ -737,7 +745,7 @@
             e.preventDefault();
 
             if (!currentEmployee) {
-                alert('⚠️ خطأ في جلسة التسجيل، الرجاء تسجيل الدخول مرة أخرى');
+                alert('⚠️ Error in login session, please login again');
                 window.location.href = 'index.html';
                 return;
             }
@@ -748,11 +756,11 @@
                 const item = checkbox.dataset.item;
                 const qty = menuItem.querySelector('.qty-input').value;
                 const comment = menuItem.querySelector('.comment-input').value.trim();
-                
-                selectedItems.push({ 
-                    item, 
+
+                selectedItems.push({
+                    item,
                     quantity: parseInt(qty),
-                    comment: comment || '' // إضافة التعليق
+                    comment: comment || '' // Add comment
                 });
             });
 
@@ -805,14 +813,14 @@
                         useFirebase = false;
                     }
                 }
-                
+
                 // Also save to localStorage as backup
                 const orders = await getOrders();
                 orders.push(order);
                 console.log('Saving order to localStorage:', order);
                 localStorage.setItem('buffet_orders', JSON.stringify(orders));
                 console.log('Order saved successfully');
-                
+
                 // Broadcast to same device (for tabs on same device)
                 try {
                     const channel = new BroadcastChannel('buffet_orders_channel');
@@ -843,7 +851,7 @@
         }
 
         // Initialize on page load
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             if (checkAuth()) {
                 initEmployeeInfo();
                 initMenu();

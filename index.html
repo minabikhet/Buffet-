@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#667eea">
-    <title>  Buffet System - login </title>
+    <title> Buffet System - login </title>
     <style>
         * {
             margin: 0;
@@ -97,7 +97,7 @@
             font-weight: bold;
             color: #000000;
             letter-spacing: 5px;
-            font-family: 'GeoHeavymetric 231  BT','Geometr231 Hv BT', 'Geometric 231', Arial, sans-serif;
+            font-family: 'GeoHeavymetric 231  BT', 'Geometr231 Hv BT', 'Geometric 231', Arial, sans-serif;
             line-height: 1;
         }
 
@@ -192,9 +192,19 @@
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
         }
 
         .links {
@@ -242,7 +252,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -283,40 +293,42 @@
             </div>
 
             <div class="form-header">
-                <h1>🔐 تسجيل الدخول</h1>
-                <p>مرحباً بك! سجل دخولك للمتابعة</p>
+                <h1>🔐 Login</h1>
+                <p>Welcome! Please login to continue</p>
             </div>
 
             <div class="error-message" id="errorMessage">
-                اسم المستخدم أو كلمة المرور غير صحيحة
+                Invalid username or password
             </div>
 
             <form id="loginForm">
                 <div class="form-group">
-                    <label>اسم المستخدم *</label>
-                    <input type="text" id="username" required placeholder="أدخل اسم المستخدم" autocomplete="username">
+                    <label>Username *</label>
+                    <input type="text" id="username" required placeholder="Enter username" autocomplete="username">
                 </div>
 
                 <div class="form-group">
-                    <label>كلمة المرور *</label>
+                    <label>Password *</label>
                     <div class="password-toggle">
-                        <input type="password" id="password" required placeholder="أدخل كلمة المرور" autocomplete="current-password">
+                        <input type="password" id="password" required placeholder="Enter password"
+                            autocomplete="current-password">
                         <button type="button" id="togglePassword">👁️</button>
                     </div>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 30px;">
                     <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: normal;">
-                        <input type="checkbox" id="rememberMe" style="width: 20px; height: 20px; cursor: pointer; accent-color: #667eea;">
-                        <span>تذكرني (حفظ بيانات الدخول)</span>
+                        <input type="checkbox" id="rememberMe"
+                            style="width: 20px; height: 20px; cursor: pointer; accent-color: #667eea;">
+                        <span>Remember me (save login data)</span>
                     </label>
                 </div>
 
-                <button type="submit" class="submit-btn">تسجيل الدخول</button>
+                <button type="submit" class="submit-btn">Login</button>
             </form>
 
             <div class="links">
-                <a href="#" id="registerLink">ليس لديك حساب؟ سجل الآن</a>
+                <a href="#" id="registerLink">Don't have an account? Register now</a>
             </div>
         </div>
     </div>
@@ -330,55 +342,56 @@
             </div>
 
             <div class="form-header">
-                <h1>👤 إنشاء حساب جديد</h1>
-                <p>سجل حسابك الآن للطلب من البوفيه</p>
+                <h1>Create New Account</h1>
+                <p>Register now to order from the buffet</p>
             </div>
 
             <div class="error-message" id="registerError"></div>
 
             <form id="registerForm">
                 <div class="form-group">
-                    <label>اسم الموظف الكامل *</label>
-                    <input type="text" id="employeeName" required placeholder="مثال: أحمد محمد">
+                    <label>Full Employee Name *</label>
+                    <input type="text" id="employeeName" required placeholder="Example: Ahmed Mohamed">
                 </div>
 
                 <div class="form-group">
-                    <label>القسم *</label>
-                    <input type="text" id="department" required placeholder="مثال: قسم تكنولوجيا المعلومات">
+                    <label>Department *</label>
+                    <input type="text" id="department" required placeholder="Example: Technology Department">
                     <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
-                        💡 لوانت من موظفين البوفيه: اكتب "بوفيه" في خانة القسم
+                        💡 If you are from the buffet: write "buffet" in the department field
                     </small>
                 </div>
 
                 <div class="form-group">
-                    <label>اسم المستخدم *</label>
-                    <input type="text" id="regUsername" required placeholder="مثال: ahmed.mohamed">
+                    <label>Username *</label>
+                    <input type="text" id="regUsername" required placeholder="Example: ahmed.mohamed">
                 </div>
 
                 <div class="form-group">
-                    <label>كلمة المرور *</label>
+                    <label>Password *</label>
                     <div class="password-toggle">
-                        <input type="password" id="regPassword" required placeholder="أدخل كلمة المرور" minlength="4">
+                        <input type="password" id="regPassword" required placeholder="Enter password" minlength="4">
                         <button type="button" id="toggleRegPassword">👁️</button>
                     </div>
                 </div>
 
-                <button type="submit" class="submit-btn">✅ إنشاء الحساب</button>
-                <button type="button" class="submit-btn" onclick="closeRegisterModal()" style="margin-top: 10px; background: #6c757d;">إلغاء</button>
+                <button type="submit" class="submit-btn">✅ Create Account</button>
+                <button type="button" class="submit-btn" onclick="closeRegisterModal()"
+                    style="margin-top: 10px; background: #6c757d;">إلغاء</button>
             </form>
         </div>
     </div>
 
     <script>
         // Toggle password visibility
-        document.getElementById('togglePassword').addEventListener('click', function() {
+        document.getElementById('togglePassword').addEventListener('click', function () {
             const passwordInput = document.getElementById('password');
             const type = passwordInput.type === 'password' ? 'text' : 'password';
             passwordInput.type = type;
             this.textContent = type === 'password' ? '👁️' : '🙈';
         });
 
-        document.getElementById('toggleRegPassword').addEventListener('click', function() {
+        document.getElementById('toggleRegPassword').addEventListener('click', function () {
             const passwordInput = document.getElementById('regPassword');
             const type = passwordInput.type === 'password' ? 'text' : 'password';
             passwordInput.type = type;
@@ -386,7 +399,7 @@
         });
 
         // Show/hide registration modal
-        document.getElementById('registerLink').addEventListener('click', function(e) {
+        document.getElementById('registerLink').addEventListener('click', function (e) {
             e.preventDefault();
             document.getElementById('registerModal').classList.add('show');
         });
@@ -397,7 +410,7 @@
         }
 
         // Load remembered credentials
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             const remembered = localStorage.getItem('remembered_credentials');
             if (remembered) {
                 const credentials = JSON.parse(remembered);
@@ -418,7 +431,7 @@
         function redirectUser(user) {
             if (user.isAdmin) {
                 window.location.href = 'admin-panel.html';
-            } else if (user.department && user.department.toLowerCase() === 'بوفيه') {
+            } else if (user.department && user.department.toLowerCase() === 'buffet') {
                 window.location.href = 'buffet-system.html';
             } else {
                 window.location.href = 'employee-order.html';
@@ -426,7 +439,7 @@
         }
 
         // Handle login
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
             const username = document.getElementById('username').value.trim();
@@ -438,8 +451,8 @@
                 const adminUser = {
                     id: 'admin',
                     username: 'Admin.buffet',
-                    name: 'المدير',
-                    department: 'الإدارة',
+                    name: 'Admin',
+                    department: 'Admin',
                     isAdmin: true
                 };
 
@@ -459,7 +472,7 @@
             const employees = JSON.parse(localStorage.getItem('buffet_employees') || '[]');
 
             // Find employee
-            const employee = employees.find(emp => 
+            const employee = employees.find(emp =>
                 emp.username === username && emp.password === password
             );
 
@@ -470,7 +483,7 @@
                     name: employee.name,
                     department: employee.department,
                     isAdmin: false,
-                    isBuffet: employee.department && employee.department.toLowerCase() === 'بوفيه'
+                    isBuffet: employee.department && employee.department.toLowerCase() === 'buffet'
                 };
 
                 sessionStorage.setItem('current_employee', JSON.stringify(userData));
@@ -485,7 +498,7 @@
             } else {
                 const errorMsg = document.getElementById('errorMessage');
                 errorMsg.classList.add('show');
-                
+
                 setTimeout(() => {
                     errorMsg.classList.remove('show');
                 }, 3000);
@@ -495,7 +508,7 @@
         });
 
         // Handle registration
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+        document.getElementById('registerForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
             const name = document.getElementById('employeeName').value.trim();
@@ -507,9 +520,9 @@
 
             if (employees.some(emp => emp.username === username)) {
                 const errorMsg = document.getElementById('registerError');
-                errorMsg.textContent = '⚠️ اسم المستخدم موجود بالفعل، اختر اسماً آخر';
+                errorMsg.textContent = '⚠️ Username already exists, choose another username';
                 errorMsg.classList.add('show');
-                
+
                 setTimeout(() => {
                     errorMsg.classList.remove('show');
                 }, 3000);
@@ -528,8 +541,8 @@
             employees.push(newEmployee);
             localStorage.setItem('buffet_employees', JSON.stringify(employees));
 
-            alert('✅ تم إنشاء الحساب بنجاح! جاري تسجيل الدخول...');
-            
+            alert('✅ Account created successfully! Redirecting to login...');
+
             closeRegisterModal();
 
             // Auto login

@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#667eea">
-    <title>طلباتي - نظام البوفيه</title>
+    <title>My Orders - Buffet System</title>
     <style>
         * {
             margin: 0;
@@ -64,7 +65,7 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .orders-container {
@@ -84,7 +85,7 @@
 
         .order-card:hover {
             transform: translateX(-5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .order-card.new {
@@ -158,8 +159,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
         }
 
         .order-items {
@@ -232,25 +240,27 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
             <div>
-                <h1>📋 طلباتي</h1>
+                <h1>📋 My Orders</h1>
                 <p id="employeeInfo" style="color: #666; margin-top: 5px;"></p>
             </div>
             <div style="display: flex; gap: 10px;">
-                <button class="btn btn-primary" onclick="window.location.href='employee-order.html'">➕ طلب جديد</button>
-                <button class="btn btn-danger" onclick="logout()">🚪 تسجيل خروج</button>
+                <button class="btn btn-primary" onclick="window.location.href='employee-order.html'">➕ New
+                    Order</button>
+                <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
             </div>
         </div>
 
         <div class="orders-container">
-            <h2 style="margin-bottom: 20px; color: #333;">طلباتي الحالية</h2>
+            <h2 style="margin-bottom: 20px; color: #333;">My Current Orders</h2>
             <div id="ordersContainer">
                 <div class="empty-state">
                     <div class="empty-state-icon">⏳</div>
-                    <h3>جاري التحميل...</h3>
+                    <h3>Loading...</h3>
                 </div>
             </div>
         </div>
@@ -294,22 +304,22 @@
                 return false;
             }
             currentEmployee = JSON.parse(employeeData);
-            
+
             if (currentEmployee.isAdmin) {
                 window.location.href = 'admin-panel.html';
                 return false;
             }
-            
+
             if (currentEmployee.isBuffet) {
                 window.location.href = 'buffet-system.html';
                 return false;
             }
-            
+
             return true;
         }
 
         function logout() {
-            if (confirm('هل تريد تسجيل الخروج؟')) {
+            if (confirm('Are you sure you want to logout?')) {
                 sessionStorage.removeItem('current_employee');
                 window.location.href = 'index.html';
             }
@@ -318,7 +328,7 @@
         async function loadMyOrders() {
             try {
                 let orders = [];
-                
+
                 // Try Firebase first
                 if (useFirebase && db) {
                     try {
@@ -331,7 +341,7 @@
                         console.error('Firebase error:', error);
                     }
                 }
-                
+
                 // Fallback to localStorage
                 if (orders.length === 0) {
                     const data = localStorage.getItem('buffet_orders');
@@ -339,19 +349,19 @@
                 }
 
                 // Filter my orders only
-                const myOrders = orders.filter(order => 
+                const myOrders = orders.filter(order =>
                     order.employeeUsername === currentEmployee.username
                 ).sort((a, b) => b.id - a.id);
 
                 displayOrders(myOrders);
-                
+
                 // Setup real-time listener
                 if (useFirebase && db) {
                     db.ref('orders').on('value', (snapshot) => {
                         const data = snapshot.val();
                         if (data) {
                             const allOrders = Object.values(data);
-                            const myOrders = allOrders.filter(order => 
+                            const myOrders = allOrders.filter(order =>
                                 order.employeeUsername === currentEmployee.username
                             ).sort((a, b) => b.id - a.id);
                             displayOrders(myOrders);
@@ -365,13 +375,13 @@
 
         function displayOrders(orders) {
             const container = document.getElementById('ordersContainer');
-            
+
             if (orders.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📭</div>
-                        <h3>ليس لديك طلبات حالياً</h3>
-                        <p>اضغط "طلب جديد" لإضافة طلب</p>
+                        <h3>You have no orders yet</h3>
+                        <p>Click "New Order" to add an order</p>
                     </div>
                 `;
                 return;
@@ -388,22 +398,22 @@
 
                 switch (order.status) {
                     case 'new':
-                        statusText = '🆕 جديد';
+                        statusText = '🆕 New';
                         statusClass = 'status-new';
                         canCancel = true;
                         break;
                     case 'preparing':
-                        statusText = '👨‍🍳 يتجهز';
+                        statusText = '👨‍🍳 Preparing';
                         statusClass = 'status-preparing';
                         canCancel = false;
                         break;
                     case 'ready':
-                        statusText = '✅ جاهز للاستلام';
+                        statusText = '✅ Ready for pickup';
                         statusClass = 'status-ready';
                         canCancel = false;
                         break;
                     case 'delivered':
-                        statusText = '✔️ تم التسليم';
+                        statusText = '✔️ Delivered';
                         statusClass = 'status-delivered';
                         canCancel = false;
                         break;
@@ -420,7 +430,7 @@
                     <div class="order-card ${order.status}">
                         <div class="order-header">
                             <div>
-                                <div class="order-id">طلب #${order.id}</div>
+                                <div class="order-id">Order #${order.id}</div>
                                 <div class="order-time">⏰ ${dateStr} - ${timeStr}</div>
                             </div>
                             <span class="status-badge ${statusClass}">${statusText}</span>
@@ -430,7 +440,7 @@
                         </div>
                         ${canCancel ? `
                             <button class="cancel-btn" onclick="cancelOrder(${order.id})">
-                                ❌ إلغاء الطلب
+                                ❌ Cancel Order      
                             </button>
                         ` : ''}
                     </div>
@@ -439,7 +449,7 @@
         }
 
         async function cancelOrder(orderId) {
-            if (!confirm('هل أنت متأكد من إلغاء هذا الطلب؟')) {
+            if (!confirm('Are you sure you want to cancel this order?')) {
                 return;
             }
 
@@ -458,22 +468,23 @@
                     localStorage.setItem('buffet_orders', JSON.stringify(orders));
                 }
 
-                alert('✅ تم إلغاء الطلب بنجاح');
+                alert('✅ Order cancelled successfully');
                 loadMyOrders();
             } catch (error) {
                 console.error('Error cancelling order:', error);
-                alert('❌ حدث خطأ في إلغاء الطلب');
+                alert('❌ Error cancelling order');
             }
         }
 
         // Initialize
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             if (checkAuth()) {
-                document.getElementById('employeeInfo').textContent = 
+                document.getElementById('employeeInfo').textContent =
                     `${currentEmployee.name} - ${currentEmployee.department}`;
                 loadMyOrders();
             }
         });
     </script>
 </body>
+
 </html>
