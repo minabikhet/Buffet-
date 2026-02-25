@@ -573,18 +573,18 @@
                 padding: 10px;
             }
 
-            .container > div:first-child {
+            .container>div:first-child {
                 padding: 15px 20px;
                 flex-direction: column;
                 gap: 15px;
             }
 
-            .container > div:first-child > div:first-child > div:first-child {
+            .container>div:first-child>div:first-child>div:first-child {
                 font-size: 36px !important;
                 letter-spacing: 3px !important;
             }
 
-            .container > div:first-child > div:first-child > div:last-child {
+            .container>div:first-child>div:first-child>div:last-child {
                 font-size: 12px !important;
             }
 
@@ -683,7 +683,7 @@
         }
 
         @media (max-width: 480px) {
-            .container > div:first-child > div:first-child > div:first-child {
+            .container>div:first-child>div:first-child>div:first-child {
                 font-size: 28px !important;
                 letter-spacing: 2px !important;
             }
@@ -751,12 +751,19 @@
 <body>
     <div class="container">
         <!-- Logo and Logout -->
-        <div style="background: white; padding: 20px 30px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); display: flex; justify-content: space-between; align-items: center;">
+        <div
+            style="background: white; padding: 20px 30px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); display: flex; justify-content: space-between; align-items: center;">
             <div style="text-align: center; flex: 1;">
-                <div style="font-size: 48px; font-weight: bold; color: #000000; letter-spacing: 5px; font-family: 'GeoHeavymetric 231  BT','Geometr231 Hv BT', 'Geometric 231', Arial, sans-serif; line-height: 1;">MARMONIL</div>
-                <div style="font-size: 14px; font-weight: 500; color: #667eea; letter-spacing: 6px; margin-top: 5px; font-family: 'Montserrat', sans-serif;">BUFFET</div>
+                <div
+                    style="font-size: 48px; font-weight: bold; color: #000000; letter-spacing: 5px; font-family: 'GeoHeavymetric 231  BT','Geometr231 Hv BT', 'Geometric 231', Arial, sans-serif; line-height: 1;">
+                    MARMONIL</div>
+                <div
+                    style="font-size: 14px; font-weight: 500; color: #667eea; letter-spacing: 6px; margin-top: 5px; font-family: 'Montserrat', sans-serif;">
+                    BUFFET</div>
             </div>
-            <button onclick="logout()" style="padding: 12px 24px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s;">🚪 تسجيل خروج</button>
+            <button onclick="logout()"
+                style="padding: 12px 24px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s;">🚪
+                تسجيل خروج</button>
         </div>
 
         <div class="main-tabs">
@@ -885,13 +892,13 @@
                 return false;
             }
             const employee = JSON.parse(employeeData);
-            
+
             // Redirect admins to admin panel
             if (employee.isAdmin) {
                 window.location.href = 'admin-panel.html';
                 return false;
             }
-            
+
             // Check if user is buffet worker
             if (!employee.isBuffet && !(employee.department && employee.department.toLowerCase() === 'بوفيه')) {
                 alert('⚠️ غير مصرح لك بالدخول لهذه الصفحة');
@@ -940,36 +947,36 @@
         function setupFirebaseListener() {
             if (useFirebase && db) {
                 console.log('🔥 Setting up Firebase listener...');
-                
+
                 // Listen for new orders
                 db.ref('orders').on('child_added', (snapshot) => {
                     const order = snapshot.val();
                     console.log('🔥 New order detected in Firebase:', order);
-                    
+
                     // Check if this is truly a new order (not from initial load)
                     const now = Date.now();
                     const orderTime = new Date(order.timestamp).getTime();
-                    
+
                     // If order is less than 10 seconds old, it's new
                     if (now - orderTime < 10000) {
                         showNotification(order);
                     }
-                    
+
                     loadOrders();
                 });
-                
+
                 // Listen for order updates
                 db.ref('orders').on('child_changed', (snapshot) => {
                     console.log('🔥 Order updated in Firebase');
                     loadOrders();
                 });
-                
+
                 // Listen for order removal
                 db.ref('orders').on('child_removed', (snapshot) => {
                     console.log('🔥 Order removed in Firebase');
                     loadOrders();
                 });
-                
+
                 console.log('✅ Firebase listener setup complete');
             }
         }
@@ -1001,7 +1008,7 @@
                         useFirebase = false;
                     }
                 }
-                
+
                 // Fallback to localStorage
                 const data = localStorage.getItem('buffet_orders');
                 return data ? JSON.parse(data) : [];
@@ -1019,10 +1026,10 @@
                         const orderRef = db.ref('orders/' + orderId);
                         const snapshot = await orderRef.once('value');
                         const order = snapshot.val();
-                        
+
                         if (order) {
                             order.status = newStatus;
-                            
+
                             if (newStatus === 'delivered') {
                                 // Move to history
                                 await db.ref('history/' + orderId).set(order);
@@ -1038,7 +1045,7 @@
                         useFirebase = false;
                     }
                 }
-                
+
                 // Also update localStorage
                 const orders = await getOrders();
                 const order = orders.find(o => o.id === orderId);
@@ -1129,7 +1136,7 @@
             // Filter to today's orders only
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
+
             const orders = allOrders.filter(order => {
                 const orderDate = new Date(order.timestamp);
                 orderDate.setHours(0, 0, 0, 0);
@@ -1406,7 +1413,7 @@
         function showNotification(order) {
             // Play notification sound
             playNotificationSound();
-            
+
             // Show browser notification if permitted
             if ('Notification' in window && Notification.permission === 'granted') {
                 const itemsList = order.items.map(item => `${item.item} ×${item.quantity}`).join(', ');
@@ -1422,22 +1429,22 @@
         function playNotificationSound() {
             // Create notification sound using Web Audio API
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
+
             // Create three beeps
             for (let i = 0; i < 3; i++) {
                 setTimeout(() => {
                     const oscillator = audioContext.createOscillator();
                     const gainNode = audioContext.createGain();
-                    
+
                     oscillator.connect(gainNode);
                     gainNode.connect(audioContext.destination);
-                    
+
                     oscillator.frequency.value = 800; // High pitch beep
                     oscillator.type = 'sine';
-                    
+
                     gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
                     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-                    
+
                     oscillator.start(audioContext.currentTime);
                     oscillator.stop(audioContext.currentTime + 0.2);
                 }, i * 300); // 300ms between beeps
@@ -1473,20 +1480,20 @@
             if (!checkAuth()) {
                 return;
             }
-            
+
             // Setup BroadcastChannel for instant notifications (same device)
             setupBroadcastChannel();
-            
+
             // Setup Firebase listener for real-time updates (cross-device)
             setupFirebaseListener();
-            
+
             // Request notification permission
             requestNotificationPermission();
-            
+
             await loadOrders();
             const orders = await getOrders();
             lastOrderCount = orders.filter(o => o.status === 'new').length;
-            
+
             // Only start polling if Firebase is not available
             if (!useFirebase) {
                 console.log('⚠️ Firebase not available, using polling');
